@@ -141,6 +141,67 @@ KUNST = {
         c("  \\__/  ~~~~~~~~~~~~~~~   \\__/ ", F.ROT),
         c("   *** ENDKAMPF BEGINNT! ****  ", F.ROT + F.FETT),
     ],
+    "schmiede": [
+        c("    *   F E U E R   *   ", F.BRAUN),
+        c("   /|\\   Esse    /|\\  ", F.BRAUN),
+        c("  [===== Amboss =====]  ", F.BRAUN),
+        c("  |~~~~  Glut  ~~~~~|  ", F.ROT),
+        c("  |___  SCHMIEDE  ___|  ", F.BRAUN + F.FETT),
+    ],
+    "sternwarte": [
+        c("   *  .  * Sterne *  .  *  ", F.BLAU),
+        c("    .   *   .   *   .   *  ", F.BLAU),
+        c("   |    ( Teleskop  )   |  ", F.BLAU),
+        c("   |___/   Sockel   \\__|  ", F.GRAU),
+        c("   [====  STERNWARTE ====] ", F.BLAU + F.FETT),
+    ],
+    "akademie": [
+        c("  | |  AKADEMIE  | |   ", F.GELB),
+        c("  |=|  _________  |=| ", F.GELB),
+        c("  | | | Variablen| | | ", F.GELB),
+        c("  | | |__________| | | ", F.GELB),
+        c("  | |  Saeulenhalle | | ", F.GELB),
+        c("  |__|______________|__| ", F.GELB + F.FETT),
+    ],
+    "taverne": [
+        c("  [======= TAVERNE =======]  ", F.BRAUN),
+        c("  | Fass |  Theke  | Fass |  ", F.BRAUN),
+        c("  | [=]  | [=] [=] |  [=] |  ", F.BRAUN),
+        c("  |    * Kerzenschein *    |  ", F.GELB),
+        c("  |______warm und gut______|  ", F.BRAUN + F.FETT),
+    ],
+    "magierschule": [
+        c("  ✨  *   MAGIERSCHULE   *  ✨  ", F.PINK),
+        c("  🪄      der Skripte      🪄  ", F.PINK),
+        c("  |   *   Bash-Zauber   *   |  ", F.PINK),
+        c("  |   Skripte entstehen!    |  ", F.PINK),
+        c("   \\________________________/  ", F.PINK),
+        c("    ✨   bash  scripts   ✨    ", F.PINK + F.FETT),
+    ],
+    "palast": [
+        c("        👑  PALAST  👑        ", F.WEISS),
+        c("       / der Benutzer \\      ", F.GRAU),
+        c("      | 🏛️  |  🏛️  |  🏛️ |   ", F.GRAU),
+        c("      |   ==  THRON  ==  |   ", F.WEISS),
+        c("       \\_________________/   ", F.GRAU),
+        c("         *  Willkommen  *    ", F.GRAU + F.WEISS),
+    ],
+    "bibliothekskeller": [
+        c("  ~~~~ KELLER der TEXTE ~~~~  ", F.CYAN),
+        c("  | 📜   Runen und Magie   |  ", F.CYAN),
+        c("  | ░░ sort | uniq | awk ░░|  ", F.CYAN),
+        c("  | ░░  sed  |  tr | cut ░░|  ", F.CYAN),
+        c("  |_________________________|  ", F.CYAN),
+        c("   ~~ Awk beobachtet dich ~~  ", F.CYAN + F.FETT),
+    ],
+    "garten": [
+        c("    🌸      GARTEN      🌸    ", F.GRUEN),
+        c("  🌺 . 🌿 . 🌼 . 🌿 . 🌼 . 🌺  ", F.GRUEN),
+        c("  | 🌳   Verknuepfungen  🌳 |  ", F.GRUEN),
+        c("  |    find  .  ln  .  du  |  ", F.GRUEN),
+        c("   \\_______________________/  ", F.GRUEN),
+        c("    🌸    Willkommen!    🌸   ", F.GRUEN + F.FETT),
+    ],
 }
 
 # ── Raum-Definitionen ──────────────────────────────────────────────────────────
@@ -181,6 +242,34 @@ RAEUME = {
                 "belohnung":"📜 Schriftrolle des Wissens",
                 "lernziel": "pwd = print working directory – dein aktueller Pfad im Dateisystem",
             },
+            {
+                "id":       "ls_la_dorf",
+                "ziel":     "Zeige auch versteckte Dateien: ls -la",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='ls' and ('-la' in cmd or '-al' in cmd),
+                "belohnung":"📜 Schriftrolle der Verborgenen",
+                "lernziel": "ls -la zeigt alle Dateien inklusive versteckter (beginnen mit .). Sehr haeufig genutzt!",
+            },
+            {
+                "id":       "ls_lh_dorf",
+                "ziel":     "Zeige lesbare Dateigroessen: ls -lh",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='ls' and '-lh' in cmd,
+                "belohnung":"📜 Schriftrolle der Groesse",
+                "lernziel": "ls -lh zeigt Dateigroessen als 1K/5M/2G statt rohe Bytes. Viel lesbarer!",
+            },
+            {
+                "id":       "ls_lt_dorf",
+                "ziel":     "Sortiere Dateien nach Datum: ls -lt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='ls' and '-lt' in cmd,
+                "belohnung":"📜 Schriftrolle der Zeit",
+                "lernziel": "ls -lt sortiert nach Aenderungsdatum, neuste zuerst. ls -ltr = aelteste zuerst.",
+            },
+            {
+                "id":       "lshelp_dorf",
+                "ziel":     "Lies die Hilfe zu ls: ls --help",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='ls' and '--help' in cmd,
+                "belohnung":"📜 Schriftrolle des Lesens",
+                "lernziel": "--help gibt es bei fast jedem Befehl! Zeigt alle Optionen. Auch: man ls fuer mehr.",
+            },
         ],
     },
     "wald": {
@@ -211,6 +300,34 @@ RAEUME = {
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ls",
                 "belohnung":"📜 Schriftrolle des Waldes",
                 "lernziel": "ls hat viele Optionen: ls -l (Details), ls -lh (Größe lesbar)",
+            },
+            {
+                "id":       "mkdir_wald",
+                "ziel":     "Erstelle einen neuen Ordner: mkdir waldlager",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='mkdir' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle der Erschaffung",
+                "lernziel": "mkdir = make directory. mkdir -p pfad/zu/ordner erstellt verschachtelte Ordner.",
+            },
+            {
+                "id":       "touch_wald",
+                "ziel":     "Erstelle eine leere Datei: touch karte.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='touch' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle der Entstehung",
+                "lernziel": "touch erstellt leere Dateien. Aktualisiert auch Zeitstempel bestehender Dateien.",
+            },
+            {
+                "id":       "rm_wald",
+                "ziel":     "Loesche die Datei: rm karte.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='rm' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle des Endes",
+                "lernziel": "rm loescht Dateien ENDGUELTIG (kein Papierkorb!). rm -r loescht Ordner rekursiv.",
+            },
+            {
+                "id":       "lsR_wald",
+                "ziel":     "Zeige alle Unterordner rekursiv: ls -R",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='ls' and '-R' in cmd,
+                "belohnung":"📜 Schriftrolle der Tiefe",
+                "lernziel": "ls -R zeigt alle Dateien durch alle Unterordner. Gut fuer Ueberblick ueber Strukturen.",
             },
         ],
     },
@@ -247,6 +364,34 @@ RAEUME = {
                 "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "touch" and len(cmd.split()) > 1,
                 "belohnung":"📜 Schriftrolle der Berührung",
                 "lernziel": "touch datei.txt – erstellt eine neue leere Datei",
+            },
+            {
+                "id":       "cat_hoehle",
+                "ziel":     "Lies die Datei: cat proviant.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='cat' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle des Lesens",
+                "lernziel": "cat zeigt Dateiinhalt. cat -n zeigt Zeilennummern. cat datei1 datei2 verbindet Dateien.",
+            },
+            {
+                "id":       "append_hoehle",
+                "ziel":     "Haenge Text an: echo 'Wasser' >> proviant.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='echo' and '>>' in cmd,
+                "belohnung":"📜 Schriftrolle des Anhaengens",
+                "lernziel": ">> haengt an ohne zu loeschen. > ueberschreibt. Immer doppeltes >> zum Anhaengen!",
+            },
+            {
+                "id":       "wc_hoehle",
+                "ziel":     "Zaehle Zeilen: wc -l proviant.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='wc' and '-l' in cmd,
+                "belohnung":"📜 Schriftrolle der Zahlen",
+                "lernziel": "wc = word count. -l zaehlt Zeilen, -w Woerter, -c Zeichen. wc -l *.txt zaehlt alle.",
+            },
+            {
+                "id":       "rmdir_hoehle",
+                "ziel":     "Erstelle und loesche Ordner: mkdir test_temp && rmdir test_temp",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and 'rmdir' in cmd,
+                "belohnung":"📜 Schriftrolle des Raeumens",
+                "lernziel": "rmdir loescht NUR leere Ordner. rm -rf ordner/ loescht alles darin (Vorsicht!).",
             },
         ],
     },
@@ -285,6 +430,34 @@ RAEUME = {
                 "belohnung":"📜 Schriftrolle des Schreibens",
                 "lernziel": 'echo "Text" > datei.txt – schreibt Text in eine Datei',
             },
+            {
+                "id":       "cat_see2",
+                "ziel":     "Lies deine Nachricht: cat nachricht.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='cat' and 'nachricht' in cmd,
+                "belohnung":"📜 Schriftrolle der Bestaetigung",
+                "lernziel": "cat zeigt was du gerade geschrieben hast. Gut zum Pruefen nach echo > Datei.",
+            },
+            {
+                "id":       "append_see",
+                "ziel":     "Haenge Text an: echo 'Der See ist schoen' >> nachricht.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='echo' and '>>' in cmd,
+                "belohnung":"📜 Schriftrolle des Wachstums",
+                "lernziel": ">> haengt an ohne zu loeschen. Denk daran: double-arrow = append, single = overwrite!",
+            },
+            {
+                "id":       "wc_see",
+                "ziel":     "Zaehle Woerter: wc -w nachricht.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='wc' and '-w' in cmd,
+                "belohnung":"📜 Schriftrolle der Worte",
+                "lernziel": "wc -w zaehlt Woerter. wc ohne Optionen zeigt Zeilen/Woerter/Zeichen gleichzeitig.",
+            },
+            {
+                "id":       "head_see",
+                "ziel":     "Zeige erste Zeile: head -1 nachricht.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='head' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle des Anfangs",
+                "lernziel": "head zeigt die ersten N Zeilen. Standard: head = 10 Zeilen. Ideal fuer grosse Dateien.",
+            },
         ],
     },
     "markt": {
@@ -294,7 +467,7 @@ RAEUME = {
             "Bunte Marktstände, Händler rufen ihre Waren.\n"
             "Eine Händlerin mit Zylinder winkt dich heran."
         ),
-        "ausgaenge": {"dorf": "Dorf", "bibliothek": "Bibliothek"},
+        "ausgaenge": {"dorf": "Dorf", "bibliothek": "Bibliothek", "garten": "Garten"},
         "npc": {
             "name": "Händlerin Zara",
             "bild": "🎩",
@@ -323,6 +496,34 @@ RAEUME = {
                 "belohnung":"📜 Schriftrolle der Bewegung",
                 "lernziel": "mv alt.txt neu.txt – verschiebt oder benennt eine Datei um",
             },
+            {
+                "id":       "cat_markt",
+                "ziel":     "Lies die Preisliste: cat preisliste.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='cat' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle des Lesens",
+                "lernziel": "cat zum Lesen. Nach cp immer pruefen ob Kopie korrekt ist. Gute Gewohnheit!",
+            },
+            {
+                "id":       "lsl_markt",
+                "ziel":     "Zeige Dateidetails: ls -l",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='ls' and '-l' in cmd,
+                "belohnung":"📜 Schriftrolle der Details",
+                "lernziel": "ls -l zeigt Berechtigungen, Groesse, Datum. Sehr informativ fuer Dateidetails.",
+            },
+            {
+                "id":       "rm_markt",
+                "ziel":     "Loesche die Kopie: rm kopie.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='rm' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle der Ordnung",
+                "lernziel": "rm loescht endgueltig. Tipp: rm -i fragt vor dem Loeschen (interaktiver Modus).",
+            },
+            {
+                "id":       "find_markt",
+                "ziel":     "Finde alle Textdateien: find . -name '*.txt'",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='find' and '.txt' in cmd,
+                "belohnung":"📜 Schriftrolle des Suchens",
+                "lernziel": "find . -name '*.txt' findet alle .txt Dateien. Wildcards: * = beliebig viele Zeichen.",
+            },
         ],
     },
     "bibliothek": {
@@ -333,7 +534,7 @@ RAEUME = {
             "die in langen Regalen bis zur Decke reichen. Ein goldener Kristallleuchter\n"
             "taucht tausend Schriften in warmes Licht."
         ),
-        "ausgaenge": {"markt": "Markt", "labor": "Labor"},
+        "ausgaenge": {"markt": "Markt", "labor": "Labor", "bibliothekskeller": "Buchkeller"},
         "npc": {
             "name": "Gelehrter Otto",
             "bild": "📖",
@@ -373,6 +574,7 @@ RAEUME = {
             },
         ],
     },
+
     "labor": {
         "name":   "Geheimes Labor",
         "emoji":  "⚗️",
@@ -381,7 +583,7 @@ RAEUME = {
             "Ueberall blubbern Reagenzglaeser und summen seltsame Maschinen.\n"
             "Hier werden Geheimnisse der Dateiberechtigungen erforscht."
         ),
-        "ausgaenge": {"bibliothek": "Bibliothek", "festung": "Festung"},
+        "ausgaenge": {"bibliothek": "Bibliothek", "festung": "Festung", "palast": "Palast"},
         "npc": {
             "name": "Professorin Ada",
             "bild": "🔬",
@@ -419,6 +621,34 @@ RAEUME = {
                 "belohnung":"📜 Schriftrolle der Ausfuehrung",
                 "lernziel": "chmod +x macht eine Datei ausfuehrbar. Noetig fuer eigene Skripte!",
             },
+            {
+                "id":       "whoami_lab",
+                "ziel":     "Wer bist du? whoami",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='whoami',
+                "belohnung":"📜 Schriftrolle der Identitaet",
+                "lernziel": "whoami zeigt deinen Benutzernamen. In Skripten oft genutzt um Root-Rechte zu pruefen.",
+            },
+            {
+                "id":       "id_lab",
+                "ziel":     "Zeige deine IDs: id",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='id',
+                "belohnung":"📜 Schriftrolle der Gruppen",
+                "lernziel": "id zeigt uid, gid und alle Gruppen. Wichtig bei Berechtigungsproblemen!",
+            },
+            {
+                "id":       "chmod644_lab",
+                "ziel":     "Nur-Lesen fuer andere: chmod 644 experiment.sh",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='chmod' and '644' in cmd,
+                "belohnung":"📜 Schriftrolle der Grenzen",
+                "lernziel": "chmod 644 = rw-r--r--. Owner lesen+schreiben, alle anderen nur lesen. Standard fuer Dateien.",
+            },
+            {
+                "id":       "stat_lab",
+                "ziel":     "Zeige Dateidetails: stat experiment.sh",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='stat' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle der Details",
+                "lernziel": "stat zeigt alles: Groesse, Inode, Zugriffszeiten, Berechtigungen. Sehr detailliert.",
+            },
         ],
     },
     "festung": {
@@ -429,7 +659,7 @@ RAEUME = {
             "Hunderte Waechter patrouillieren auf den Zinnen.\n"
             "General Klaus beobachtet mit wachsamem Blick jeden Prozess im System."
         ),
-        "ausgaenge": {"labor": "Labor", "bergpass": "Bergpass"},
+        "ausgaenge": {"labor": "Labor", "bergpass": "Bergpass", "schmiede": "Schmiede"},
         "npc": {
             "name": "General Klaus",
             "bild": "🛡️",
@@ -467,6 +697,34 @@ RAEUME = {
                 "belohnung":"📜 Schriftrolle des Hintergrunds",
                 "lernziel": "& am Ende startet einen Prozess im Hintergrund. Mit 'jobs' siehst du ihn.",
             },
+            {
+                "id":       "jobs_fest",
+                "ziel":     "Zeige Hintergrundjobs: jobs",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='jobs',
+                "belohnung":"📜 Schriftrolle der Arbeit",
+                "lernziel": "jobs zeigt Hintergrundjobs. fg %1 bringt Job 1 in den Vordergrund. bg %1 in den Hintergrund.",
+            },
+            {
+                "id":       "kill_fest",
+                "ziel":     "Beende sleep-Job: kill %1",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='kill' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle des Endes",
+                "lernziel": "kill %1 beendet Job 1. kill -9 PID = Sofortbeendigung. kill -15 PID = sanftes Beenden.",
+            },
+            {
+                "id":       "uptime_fest",
+                "ziel":     "Zeige Systemlaufzeit: uptime",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='uptime',
+                "belohnung":"📜 Schriftrolle der Ausdauer",
+                "lernziel": "uptime zeigt Laufzeit und Load Average (1/5/15-Min-Schnitt). >CPU-Kerne = ueberlastet.",
+            },
+            {
+                "id":       "top_fest",
+                "ziel":     "Zeige Prozessauslastung: top -bn1",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='top',
+                "belohnung":"📜 Schriftrolle der Last",
+                "lernziel": "top zeigt CPU/RAM-Auslastung live. -bn1 = batch/einmal. htop ist die modernere Alternative.",
+            },
         ],
     },
     "bergpass": {
@@ -477,7 +735,7 @@ RAEUME = {
             "treibt Haendler Gerhard seinen Handel mit begehrter Software.\n"
             "Wer die richtigen apt-Befehle kennt, findet hier alles!"
         ),
-        "ausgaenge": {"festung": "Festung", "hafen": "Hafen"},
+        "ausgaenge": {"festung": "Festung", "hafen": "Hafen", "sternwarte": "Sternwarte"},
         "npc": {
             "name": "Haendler Gerhard",
             "bild": "🏔️",
@@ -515,6 +773,34 @@ RAEUME = {
                 "belohnung":"📜 Schriftrolle der Pakete",
                 "lernziel": "apt list --installed zeigt alle installierten Pakete. sudo apt install fuer neue!",
             },
+            {
+                "id":       "which_berg",
+                "ziel":     "Finde wo nano liegt: which nano",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='which' and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle des Weges",
+                "lernziel": "which findet den vollen Pfad eines Programms (z.B. /usr/bin/nano). Gut in Skripten.",
+            },
+            {
+                "id":       "dpkgl_berg",
+                "ziel":     "Liste installierte Pakete: dpkg -l | head -20",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='dpkg' and '-l' in cmd,
+                "belohnung":"📜 Schriftrolle der Inventur",
+                "lernziel": "dpkg -l listet alle installierten Pakete. dpkg -l | grep python sucht spezifische.",
+            },
+            {
+                "id":       "aptdep_berg",
+                "ziel":     "Zeige Abhaengigkeiten: apt-cache depends nano",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and 'depends' in cmd,
+                "belohnung":"📜 Schriftrolle der Beziehungen",
+                "lernziel": "apt-cache depends zeigt welche Pakete benoetigt werden. Wichtig bei Installationsproblemen.",
+            },
+            {
+                "id":       "aptinstall_berg",
+                "ziel":     "Simuliere Installation: apt-get install -s sl",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] in ['apt-get','apt'] and 'install' in cmd,
+                "belohnung":"📜 Schriftrolle der Magie",
+                "lernziel": "apt-get install -s simuliert ohne wirklich zu installieren. sudo apt install NAME installiert.",
+            },
         ],
     },
     "hafen": {
@@ -525,7 +811,7 @@ RAEUME = {
             "wie Schiffe ein- und auslaufen. Hier lernt Mia, wie Computer miteinander\n"
             "kommunizieren und Dateien aus dem Internet heruntergeladen werden."
         ),
-        "ausgaenge": {"bergpass": "Bergpass", "turm": "Turm"},
+        "ausgaenge": {"bergpass": "Bergpass", "turm": "Turm", "akademie": "Akademie"},
         "npc": {
             "name": "Kapitaenin Sara",
             "bild": "🚢",
@@ -564,6 +850,34 @@ RAEUME = {
                 "belohnung":"📜 Schriftrolle der Abfrage",
                 "lernziel": "curl sendet HTTP-Anfragen und zeigt Antworten. curl -O laedt Dateien herunter.",
             },
+            {
+                "id":       "curlI_haf",
+                "ziel":     "Zeige HTTP-Header: curl -I https://example.com",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='curl' and '-I' in cmd,
+                "belohnung":"📜 Schriftrolle der Kopfzeilen",
+                "lernziel": "curl -I zeigt nur HTTP-Header (Status-Code, Content-Type etc.) ohne Body. Sehr nuetzlich!",
+            },
+            {
+                "id":       "hostname_haf",
+                "ziel":     "Zeige deinen Hostnamen: hostname",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='hostname',
+                "belohnung":"📜 Schriftrolle des Namens",
+                "lernziel": "hostname zeigt den Computernamen. hostname -I zeigt alle IP-Adressen. Aenderbar in /etc/hostname.",
+            },
+            {
+                "id":       "ss_haf",
+                "ziel":     "Zeige offene Ports: ss -tuln",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] in ['ss','netstat'],
+                "belohnung":"📜 Schriftrolle der Verbindungen",
+                "lernziel": "ss -tuln zeigt offene Ports und Verbindungen. netstat -tuln ist die aeltere Alternative.",
+            },
+            {
+                "id":       "nslookup_haf",
+                "ziel":     "Schlage IP nach: nslookup google.com",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] in ['nslookup','dig','host'] and len(cmd.split())>=2,
+                "belohnung":"📜 Schriftrolle der Adressen",
+                "lernziel": "nslookup loest Domainnamen zu IP-Adressen (DNS). dig ist modernere Alternative.",
+            },
         ],
     },
     "turm": {
@@ -574,7 +888,7 @@ RAEUME = {
             "umgeben von schwebenden Schriftzeichen und leuchtenden Bash-Formeln.\n"
             "Zauberer Xan huetet die alten Geheimnisse der Skripte."
         ),
-        "ausgaenge": {"hafen": "Hafen", "drachenfestung": "Drachenfestung"},
+        "ausgaenge": {"hafen": "Hafen", "drachenfestung": "Drachenfestung", "taverne": "Taverne"},
         "npc": {
             "name": "Zauberer Xan",
             "bild": "🔮",
@@ -615,6 +929,34 @@ RAEUME = {
                 "belohnung":"📜 Schriftrolle des Lebens",
                 "lernziel": "chmod +x macht das Skript ausfuehrbar. Dann starten mit: ./skript.sh",
             },
+            {
+                "id":       "execute_turm",
+                "ziel":     "Fuehre das Skript aus: ./experiment.sh",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0].startswith('./'),
+                "belohnung":"📜 Schriftrolle der Ausfuehrung",
+                "lernziel": "./ fuehrt Skript im aktuellen Ordner aus. Braucht chmod +x vorher. Beginnt mit #!/bin/bash.",
+            },
+            {
+                "id":       "osrelease_turm",
+                "ziel":     "Welches Ubuntu? cat /etc/os-release",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='cat' and 'os-release' in cmd,
+                "belohnung":"📜 Schriftrolle des Systems",
+                "lernziel": "cat /etc/os-release zeigt Ubuntu-Version und Systeminfos. lsb_release -a ist alternativ.",
+            },
+            {
+                "id":       "uname_turm",
+                "ziel":     "Zeige Kernel-Info: uname -a",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='uname',
+                "belohnung":"📜 Schriftrolle des Kerns",
+                "lernziel": "uname -a zeigt Kernel-Version, Architektur, Hostname. uname -r = nur Kernel-Version.",
+            },
+            {
+                "id":       "history_turm",
+                "ziel":     "Zeige Befehlshistorie: history",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='history',
+                "belohnung":"📜 Schriftrolle der Geschichte",
+                "lernziel": "history zeigt alle getippten Befehle. !! wiederholt letzten. !42 = Befehl Nr 42. Strg+R sucht.",
+            },
         ],
     },
     "drachenfestung": {
@@ -646,6 +988,20 @@ RAEUME = {
         },
         "quests": [
             {
+                "id":       "ls_drache",
+                "ziel":     "Erkunde die Festung: ls -la",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='ls' and '-l' in cmd,
+                "belohnung":"⚔️ Erkundungszeichen",
+                "lernziel": "Immer erstmal ls -la! Berechtigungen, versteckte Dateien, alles auf einen Blick.",
+            },
+            {
+                "id":       "cat_drache",
+                "ziel":     "Lies das Geheimdokument: cat drachen_geheimnis.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0]=='cat' and 'geheimnis' in cmd,
+                "belohnung":"⚔️ Wissenszeichen",
+                "lernziel": "cat zum Lesen, grep zum Suchen. Zusammen maechtiger als einzeln!",
+            },
+            {
                 "id":    "grep_drache",
                 "ziel":  "Finde die Schwaeche des Drachen! Tippe: grep \"SCHWAECHE\" drachen_geheimnis.txt",
                 "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "grep" and len(cmd.split()) >= 3,
@@ -668,7 +1024,886 @@ RAEUME = {
             },
         ],
     },
+
+    "schmiede": {
+        "name": "Schmiede der Archive",
+        "emoji": "⚒️",
+        "beschreibung": "Eine mächtige Schmiede mit loderndem Feuer und gluehenden Kohlen, wo Daten zu Archiven verdichtet werden. Hier lernst du tar, gzip und zip zu meistern.",
+        "ausgaenge": {"festung": "Festung"},
+        "ascii_art": [
+            "    *   F E U E R   *   ",
+            "   /|\\   Esse    /|\\  ",
+            "  [===== Amboss =====]  ",
+            "  |~~~~  Glut  ~~~~~|  ",
+            "  |___  SCHMIEDE  ___|  ",
+        ],
+        "npc": {
+            "name": "Schmiedin Rosa",
+            "bild": "🔨",
+            "dialoge": [
+                "Willkommen in der Schmiede der Archive! Ich bin Rosa, Hueterin der Archivkunst. Hier formen wir nicht nur Metall, sondern auch Daten! Das wichtigste Werkzeug ist 'tar'. Erstelle dein erstes Archiv: tar -czvf archiv.tar.gz buecher.txt - Merke: c=create, z=gzip, v=verbose, f=filename!",
+                "Sehr gut! Jetzt lernst du Archivinhalte zu lesen und zu entpacken. Mit 'tar -tzvf archiv.tar.gz' listest du alle Dateien ohne zu entpacken - immer zuerst schauen was drin ist! Dann mit 'tar -xzvf archiv.tar.gz' entpackst du: x=extract. Das Trio c=erstellen, t=auflisten, x=entpacken ist der Kern von tar!",
+                "Ausgezeichnet, Archivschmiedin Mia! Du beherrschst das gesamte Arsenal: tar (c/t/x fuer alles rund ums Archiv), gzip und gunzip fuer Einzeldateien (.gz), zip und unzip fuer Windows-Kompatibilitaet. Backups und Dateiuebertragungen werden dich nie mehr schrecken!",
+            ],
+        },
+        "quests": [
+            {
+                "id": "tar_create",
+                "ziel": "Erstelle Archiv: tar -czvf archiv.tar.gz buecher.txt",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'tar' and '-c' in cmd,
+                "belohnung": "📜 Schriftrolle des Archivs",
+                "lernziel": "tar -czvf = create, zip, verbose, file. Wichtig fuer Backups!",
+            },
+            {
+                "id": "tar_list",
+                "ziel": "Zeige Archivinhalt: tar -tzvf archiv.tar.gz",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'tar' and '-t' in cmd,
+                "belohnung": "📜 Schriftrolle des Inhalts",
+                "lernziel": "tar -t = list. Immer pruefen bevor man entpackt. Was ist drin?",
+            },
+            {
+                "id": "tar_extract",
+                "ziel": "Entpacke Archiv: tar -xzvf archiv.tar.gz",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'tar' and '-x' in cmd,
+                "belohnung": "📜 Schriftrolle der Befreiung",
+                "lernziel": "tar -x = extract. Merke: c=create, t=table/list, x=extract.",
+            },
+            {
+                "id": "gzip_comp",
+                "ziel": "Komprimiere Datei: gzip lagerliste.txt",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'gzip' and len(cmd.split()) >= 2,
+                "belohnung": "📜 Schriftrolle der Verdichtung",
+                "lernziel": "gzip komprimiert (.gz). Originaldatei wird ersetzt. gunzip zum Dekomprimieren.",
+            },
+            {
+                "id": "gunzip_de",
+                "ziel": "Dekomprimiere: gunzip lagerliste.txt.gz",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'gunzip',
+                "belohnung": "📜 Schriftrolle der Befreiung",
+                "lernziel": "gunzip oder gzip -d dekomprimiert. zcat zeigt komprimierte Dateien ohne Entpacken.",
+            },
+            {
+                "id": "zip_create",
+                "ziel": "Erstelle ZIP: zip paket.zip *.txt",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'zip' and len(cmd.split()) >= 3,
+                "belohnung": "📜 Schriftrolle der Buendelung",
+                "lernziel": "zip ist Windows-kompatibel. unzip zum Entpacken. Plattformuebergreifend!",
+            },
+        ],
+        "dateien": [
+            {
+                "dateiname": "lagerliste.txt",
+                "inhalt": "Vorraete in der Schmiede:\n- Eisen x 50\n- Kohle x 30\n- Kupfer x 20\n",
+            },
+        ],
+    },
+    "sternwarte": {
+        "name": "Sternwarte des Systems",
+        "emoji": "🔭",
+        "beschreibung": "Ein hoher Beobachtungsturm mit riesigem Teleskop und freiem Blick auf das gesamte System. Astronom Kepler lehrt dich hier die Systembeobachtung mit uname, df, free und mehr.",
+        "ausgaenge": {"bergpass": "Bergpass"},
+        "ascii_art": [
+            "   *  .  * Sterne *  .  *  ",
+            "    .   *   .   *   .   *  ",
+            "   |    ( Teleskop  )   |  ",
+            "   |___/   Sockel   \\__|  ",
+            "   [====  STERNWARTE ====] ",
+        ],
+        "npc": {
+            "name": "Astronom Kepler",
+            "bild": "⭐",
+            "dialoge": [
+                "Willkommen in der Sternwarte des Systems! Ich bin Kepler, Beobachter der digitalen Sterne. Wie ich Himmelskoerper analysiere, analysierst du dein System! Starte mit 'uname -a' - es zeigt Kernel-Version, Hostname und Architektur. Das Fundament jeder Systemanalyse!",
+                "Hervorragend! Nun erkunden wir die Ressourcen. 'df -h' zeigt Festplattenplatz - h bedeutet human-readable, also GB und MB statt rohe Bytes. 'free -h' zeigt RAM-Nutzung, entscheidend fuer die Performance! 'du -sh *' zeigt welche Ordner am meisten Platz belegen. Diese drei Befehle retten jeden Administrator!",
+                "Fantastisch! Du bist nun Systemastronom! Dein Werkzeugkasten: uname (System-Identitaet), df (Festplattenplatz), free (RAM-Nutzung), du (Ordner-Groessen), date (aktuelles Datum und Zeit), cal (Kalender), uptime (Laufzeit und Load Average). Mit diesen Werkzeugen kennst du deinen Server wie ich die Sterne!",
+            ],
+        },
+        "quests": [
+            {
+                "id": "uname_stern",
+                "ziel": "Zeige Systeminfo: uname -a",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'uname',
+                "belohnung": "📜 Schriftrolle des Universums",
+                "lernziel": "uname -a: Kernel, Hostname, Architektur. uname -r = nur Kernel-Version.",
+            },
+            {
+                "id": "df_stern",
+                "ziel": "Zeige Festplattenplatz: df -h",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'df',
+                "belohnung": "📜 Schriftrolle des Raums",
+                "lernziel": "df -h zeigt Festplattenplatz. -h = human-readable (GB/MB). Wichtig fuer Admins!",
+            },
+            {
+                "id": "free_stern",
+                "ziel": "Zeige RAM-Nutzung: free -h",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'free',
+                "belohnung": "📜 Schriftrolle des Gedaechtnisses",
+                "lernziel": "free -h zeigt RAM-Nutzung. Buff/Cache kann freigegeben werden. Swap = Auslagerungsdatei.",
+            },
+            {
+                "id": "du_stern",
+                "ziel": "Zeige Ordnergroessen: du -sh *",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'du',
+                "belohnung": "📜 Schriftrolle der Groesse",
+                "lernziel": "du -sh * = disk usage, summary, human-readable. du -sh /home/*/ zeigt Home-Groessen.",
+            },
+            {
+                "id": "date_stern",
+                "ziel": "Zeige Datum und Zeit: date",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'date',
+                "belohnung": "📜 Schriftrolle der Zeit",
+                "lernziel": "date zeigt Datum/Zeit. date '+%Y-%m-%d' = ISO-Format. Sehr nuetzlich in Skripten.",
+            },
+            {
+                "id": "cal_stern",
+                "ziel": "Zeige Kalender: cal",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'cal',
+                "belohnung": "📜 Schriftrolle des Kalenders",
+                "lernziel": "cal zeigt den Monat. cal -3 = 3 Monate. cal 2024 = ganzes Jahr.",
+            },
+            {
+                "id": "uptime_stern",
+                "ziel": "Zeige Systemlaufzeit: uptime",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'uptime',
+                "belohnung": "📜 Schriftrolle der Ausdauer",
+                "lernziel": "uptime: Laufzeit und Load Average (1/5/15 Min). <CPU-Kerne = entspannt.",
+            },
+        ],
+        "dateien": [
+            {
+                "dateiname": "sternenkarte.txt",
+                "inhalt": "=== Systembeobachtung ===\nuname, df, free, du, date, cal\n",
+            },
+        ],
+    },
+    "akademie": {
+        "name": "Akademie der Variablen",
+        "emoji": "🎓",
+        "beschreibung": "Eine ehrwuerdige Universitaet mit Saeulengaengen und Bueregalen voller Wissen. Professorin Euler enthuellt hier die Geheimnisse der Umgebungsvariablen und des export-Befehls.",
+        "ausgaenge": {"hafen": "Hafen", "magierschule": "Magierschule"},
+        "ascii_art": [
+            "  | |  AKADEMIE  | |   ",
+            "  |=|  _________  |=| ",
+            "  | | | Variablen| | | ",
+            "  | | |__________| | | ",
+            "  | |  Saeulenhalle | | ",
+            "  |__|______________|__| ",
+        ],
+        "npc": {
+            "name": "Professorin Euler",
+            "bild": "📐",
+            "dialoge": [
+                "Guten Tag! Ich bin Professorin Euler, und ich heisse dich herzlich willkommen an der Akademie der Variablen! Umgebungsvariablen sind magische Botschaften, die dein System dir bereitstellt. Die wichtigste: $HOME! Probiere: echo $HOME - Das Dollarzeichen sagt Linux: Zeig mir den Wert dieser Variable!",
+                "Wunderbar! Weiter geht es mit deinem Benutzernamen: echo $USER zeigt wer du bist, perfekt fuer Skripte! Und echo $PATH zeigt alle Ordner, wo Linux nach Programmen sucht, getrennt durch Doppelpunkte. Wenn ein Programm nicht gefunden wird, liegt es oft am falschen $PATH!",
+                "Exzellent! Jetzt erschaffst du eigene Variablen! Mit 'export ZAUBER=Expecto' setzt du eine Variable und machst sie fuer alle Unterprozesse sichtbar. Ohne export ist sie nur in deiner Shell bekannt. 'env | head -10' zeigt alle aktuell gesetzten Variablen - eine ganze Schatzkammer!",
+                "Magnifico! Du hast die Akademie der Variablen erfolgreich abgeschlossen! Die wichtigsten Variablen: $HOME (Heimatverzeichnis), $USER (Benutzername), $PATH (Suchpfade fuer Programme), $SHELL (deine aktive Shell). Mit export teilst du Variablen mit Unterprogrammen. printenv prueft einzelne Variablen gezielt. Die Magierschule wartet!",
+            ],
+        },
+        "quests": [
+            {
+                "id": "home_akad",
+                "ziel": "Zeige Home: echo $HOME",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'echo' and 'HOME' in cmd,
+                "belohnung": "📜 Schriftrolle des Heims",
+                "lernziel": "$HOME = dein Home-Verzeichnis. cd ohne Argumente = cd $HOME.",
+            },
+            {
+                "id": "user_akad",
+                "ziel": "Zeige Benutzer: echo $USER",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'echo' and 'USER' in cmd,
+                "belohnung": "📜 Schriftrolle des Namens",
+                "lernziel": "$USER enthaelt Benutzernamen. $UID = User-ID. Nuetzlich in Skripten.",
+            },
+            {
+                "id": "path_akad",
+                "ziel": "Zeige Suchpfad: echo $PATH",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'echo' and 'PATH' in cmd,
+                "belohnung": "📜 Schriftrolle der Wege",
+                "lernziel": "$PATH: Ordner wo Linux Programme sucht. : als Trenner. which zeigt welcher Pfad genutzt.",
+            },
+            {
+                "id": "export_akad",
+                "ziel": "Setze Variable: export ZAUBER='Expecto'",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'export',
+                "belohnung": "📜 Schriftrolle der Schoepfung",
+                "lernziel": "export macht Variablen fuer Kind-Prozesse sichtbar. Ohne export: nur in Shell sichtbar.",
+            },
+            {
+                "id": "env_akad",
+                "ziel": "Zeige Umgebung: env | head -10",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'env',
+                "belohnung": "📜 Schriftrolle der Umgebung",
+                "lernziel": "env zeigt alle gesetzten Variablen. printenv VARIABLE zeigt einzelne.",
+            },
+            {
+                "id": "printenv_akad",
+                "ziel": "Pruefe Variable: printenv HOME",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'printenv',
+                "belohnung": "📜 Schriftrolle der Pruefung",
+                "lernziel": "printenv NAME zeigt Wert. Gibt nichts aus wenn Variable nicht gesetzt.",
+            },
+        ],
+        "dateien": [
+            {
+                "dateiname": "variablen.txt",
+                "inhalt": "Wichtige Umgebungsvariablen:\n$HOME - Home-Verzeichnis\n$USER - Benutzername\n$PATH - Suchpfad\n$SHELL - Shell-Pfad\n",
+            },
+        ],
+    },
+    "taverne": {
+        "name": "Taverne der Tricks",
+        "emoji": "🍺",
+        "beschreibung": "Eine gemütliche Taverne mit Holzfaessern, Kerzen und warmem Herdfeuer. Wirt Gottfried kennt alle Shell-Tricks und teilt sie gerne bei einem Becher Met.",
+        "ausgaenge": {"turm": "Turm"},
+        "ascii_art": [
+            "  [======= TAVERNE =======]  ",
+            "  | Fass |  Theke  | Fass |  ",
+            "  | [=]  | [=] [=] |  [=] |  ",
+            "  |    * Kerzenschein *    |  ",
+            "  |______warm und gut______|  ",
+        ],
+        "npc": {
+            "name": "Wirt Gottfried",
+            "bild": "🧙",
+            "dialoge": [
+                "Willkommen in der Taverne der Tricks! Ich bin Gottfried, Wirt und Meister der verborgenen Shell-Kuenste! Setz dich und lass dir von mir die Geheimnisse der Profis verraten! Starte mit: history | tail -20 - Du siehst deine letzten 20 Befehle. Mit !42 fuehrst du Befehl 42 erneut aus. Strg+R sucht im Verlauf!",
+                "Bravo! Jetzt die echten Profitricks: Mit 'alias ll=ls -la' erstellst du eigene Kurzbefehle, in ~/.bashrc gespeichert bleiben sie dauerhaft! 'type ls' zeigt ob ls ein Programm, Alias oder Shell-Built-in ist, unverzichtbar zur Fehlersuche. 'which python3' zeigt den vollen Pfad, wichtig bei mehreren installierten Versionen!",
+                "Prost auf dich, wahrer Shell-Meister! Meine besten Geheimtipps: history und Strg+R fuer blitzschnelle Befehlssuche, alias spart Tipparbeit, type und which spueren Programme auf, echo $? prueft den letzten Exit-Code (0=Erfolg!), tee zeigt Ausgabe gleichzeitig an und speichert sie. Und vergiss nie die Tab-Taste fuer Autovervollstaendigung!",
+            ],
+        },
+        "quests": [
+            {
+                "id": "history_tav",
+                "ziel": "Zeige Verlauf: history | tail -20",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'history',
+                "belohnung": "📜 Schriftrolle der Erinnerung",
+                "lernziel": "history zeigt alle Befehle mit Nummern. !42 = Befehl 42. !! = letzter. Strg+R sucht.",
+            },
+            {
+                "id": "alias_tav",
+                "ziel": "Erstelle Kurzbefehl: alias ll='ls -la'",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'alias',
+                "belohnung": "📜 Schriftrolle der Abkuerzung",
+                "lernziel": "alias erstellt Kurzbefehle. In ~/.bashrc = dauerhaft. alias ohne Args = alle anzeigen.",
+            },
+            {
+                "id": "type_tav",
+                "ziel": "Was ist ls? type ls",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'type' and len(cmd.split()) >= 2,
+                "belohnung": "📜 Schriftrolle der Wahrheit",
+                "lernziel": "type zeigt ob Programm, Alias, Shell-Funktion oder Built-in. Nuetzlich zur Fehlersuche.",
+            },
+            {
+                "id": "which_tav",
+                "ziel": "Wo liegt Python? which python3",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'which' and len(cmd.split()) >= 2,
+                "belohnung": "📜 Schriftrolle des Pfades",
+                "lernziel": "which zeigt vollen Pfad. Gut wenn mehrere Versionen installiert sind.",
+            },
+            {
+                "id": "exitcode_tav",
+                "ziel": "Pruefe Exit-Code: echo $?",
+                "check": lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == 'echo' and '?' in cmd,
+                "belohnung": "📜 Schriftrolle des Ergebnisses",
+                "lernziel": "$? = Exit-Code des letzten Befehls. 0=Erfolg, sonst Fehler. In Skripten sehr wichtig!",
+            },
+            {
+                "id": "tee_tav",
+                "ziel": "Zeige und speichere: ls | tee liste.txt",
+                "check": lambda cmd, out, p: 'tee' in cmd,
+                "belohnung": "📜 Schriftrolle des T-Stuecks",
+                "lernziel": "tee zeigt Ausgabe UND speichert gleichzeitig. Wie ein T-Stueck in einer Wasserleitung!",
+            },
+        ],
+        "dateien": [
+            {
+                "dateiname": "trickliste.txt",
+                "inhalt": "Shell-Tricks:\nStrg+C - Abbrechen\nStrg+L - Leeren\nStrg+A - Zeilenanfang\nTab - Autovervollstaendigung\nPfeil-Oben - Vorheriger Befehl\n",
+            },
+        ],
+    },
+
+    "magierschule": {
+        "name": "Magierschule der Skripte",
+        "emoji": "🪄",
+        "beschreibung": (
+            "In der Magierschule der Skripte lernst du die Kunst des Bash-Skriptings: "
+            "Variablen setzen, Schleifen schreiben und Bedingungen formulieren. "
+            "Mit dem Wissen der Zauberlehrerin Hypathia wirst du deine eigenen Skripte erschaffen!"
+        ),
+        "ausgaenge": {
+            "akademie": "Akademie",
+        },
+        "npc": {
+            "name": "Zauberlehrerin Hypathia",
+            "bild": "✨",
+            "dialoge": [
+                "Willkommen, Zauberlehrling! Ich bin Hypathia, Meisterin der Bash-Skripte! ✨ "
+                "Das Fundament aller Magie sind Variablen. Setze deine erste Variable: NAME='Linux' "
+                "– kein Leerzeichen um das Gleichheitszeichen, das ist das erste Gesetz der Skript-Magie!",
+                "Wunderbar! Jetzt rufe deine Variable mit echo $NAME – das Dollarzeichen beschwört den Wert. 🌟 "
+                "Und dann lerne Schleifen: for i in 1 2 3; do echo $i; done "
+                "– Wiederholung ist die Mutter der Skript-Magie!",
+                "Beeindruckend! Jetzt zu den mächtigsten Zaubern: if [ -f zauber.sh ]; then echo 'Vorhanden'; fi "
+                "– Bedingungen entscheiden das Schicksal. ✨ test && kombiniert Zaubersprüche. "
+                "Dann erschaffe dein erstes eigenes Skript mit echo und >!",
+                "Du hast alle sieben Skript-Zauber gemeistert! 🪄 "
+                "Das große Wissen: NAME='Wert' setzt Variablen, $NAME ruft sie, "
+                "for...do...done sind Schleifen, if...fi sind Bedingungen. "
+                "#!/bin/bash kommt immer zuerst, chmod +x macht ausführbar. "
+                "Du bist nun eine echte Skript-Magierin!",
+            ],
+        },
+        "ascii_art": [
+            "  ✨  *   MAGIERSCHULE   *  ✨  ",
+            "  🪄      der Skripte      🪄  ",
+            "  |   *   Bash-Zauber   *   |  ",
+            "  |   Skripte entstehen!    |  ",
+            "   \\________________________/  ",
+            "    ✨   bash  scripts   ✨    ",
+        ],
+        "quests": [
+            {
+                "id": "var_mag",
+                "ziel": "Setze Variable: NAME='Linux'",
+                "check": lambda cmd, out, p: (
+                    "=" in cmd
+                    and bool(cmd.split())
+                    and cmd.split()[0] not in [
+                        "cd", "ls", "cat", "echo", "grep", "find",
+                        "chmod", "cp", "mv", "rm", "mkdir", "touch", "pwd",
+                    ]
+                ),
+                "belohnung": "📜 Schriftrolle der Beschwörung",
+                "lernziel": "Variablen in Bash: NAME='Wert'. Kein Leerzeichen um =! Zugriff mit $NAME.",
+            },
+            {
+                "id": "echo_var_mag",
+                "ziel": "Nutze Variable: echo $NAME",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "echo"
+                    and "$" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle des Rufens",
+                "lernziel": (
+                    "In doppelten Anführungszeichen werden Variablen expandiert. "
+                    "In einfachen nicht!"
+                ),
+            },
+            {
+                "id": "forloop_mag",
+                "ziel": "Erstelle Schleife: for i in 1 2 3; do echo $i; done",
+                "check": lambda cmd, out, p: (
+                    "for" in cmd
+                    and "do" in cmd
+                    and "done" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle der Wiederholung",
+                "lernziel": (
+                    "for i in LISTE; do BEFEHL; done. "
+                    "Auch: for f in *.txt; do cat $f; done"
+                ),
+            },
+            {
+                "id": "if_mag",
+                "ziel": "Schreibe Bedingung: if [ -f zauber.sh ]; then echo 'Vorhanden'; fi",
+                "check": lambda cmd, out, p: (
+                    "if" in cmd
+                    and "fi" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle der Entscheidung",
+                "lernziel": (
+                    "if [ BEDINGUNG ]; then...; fi. "
+                    "-f=Datei, -d=Ordner. [ ] braucht Leerzeichen!"
+                ),
+            },
+            {
+                "id": "test_mag",
+                "ziel": "Teste Datei: test -f zauber.sh && echo 'Ja'",
+                "check": lambda cmd, out, p: (
+                    "&&" in cmd
+                    and ("test" in cmd or "[" in cmd)
+                ),
+                "belohnung": "📜 Schriftrolle des Tests",
+                "lernziel": (
+                    "test -f = Datei vorhanden? "
+                    "&& = nur wenn Erfolg. || = nur wenn Fehler."
+                ),
+            },
+            {
+                "id": "script_mag",
+                "ziel": "Schreibe Skript: echo -e '#!/bin/bash\\necho Hallo' > mein.sh",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "echo"
+                    and ".sh" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle der Schöpfung",
+                "lernziel": (
+                    "#!/bin/bash muss erste Zeile sein (Shebang). "
+                    "echo -e erlaubt \\n als Zeilenumbruch."
+                ),
+            },
+            {
+                "id": "exec_mag",
+                "ziel": "Fuehre Skript aus: chmod +x mein.sh && ./mein.sh",
+                "check": lambda cmd, out, p: (
+                    "chmod" in cmd
+                    and "+x" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle des Lebens",
+                "lernziel": (
+                    "chmod +x dann ./ - vollstaendiger Workflow fuer eigene Bash-Skripte. "
+                    "Klappt immer!"
+                ),
+            },
+        ],
+        "dateien": [
+            {
+                "dateiname": "zauber_vorlage.sh",
+                "inhalt": (
+                    "#!/bin/bash\n"
+                    "# Kommentar\n"
+                    "NAME='Mia'\n"
+                    "echo \"Hallo, $NAME!\"\n"
+                    "for i in 1 2 3; do echo \"Nr: $i\"; done\n"
+                ),
+            },
+        ],
+    },
+
+    "palast": {
+        "name": "Palast der Benutzer",
+        "emoji": "🏛️",
+        "beschreibung": (
+            "Im Palast der Benutzer herrscht König Root über alle Konten und Gruppen. "
+            "Hier lernst du, Benutzer zu verstehen: whoami, id, groups "
+            "und die heiligen Dateien /etc/passwd und /etc/group."
+        ),
+        "ausgaenge": {
+            "labor": "Labor",
+        },
+        "npc": {
+            "name": "Koenig Root",
+            "bild": "👑",
+            "dialoge": [
+                "Ich bin König Root, Herrscher aller Benutzer! 👑 "
+                "In meinem Reich kennt jeder seinen Platz. "
+                "Erkenne zuerst dich selbst: whoami zeigt deinen Namen, "
+                "id zeigt deine vollständige Identität mit uid, gid und allen Gruppen!",
+                "Gut gemacht! Nun erkunde die Gilden: groups zeigt deine Mitgliedschaften. 🏛️ "
+                "Die sudo-Gruppe ist Adel! Schau in /etc/passwd – dort wohnen alle Untertanen. "
+                "Und /etc/group zeigt alle Zünfte des Reiches.",
+                "Du kennst mein Reich! 👑 "
+                "Das große Wissen: whoami=Name, id=volle Identität (uid/gid/groups), "
+                "groups=Mitgliedschaften, /etc/passwd=alle Benutzer (name:x:uid:gid:info:home:shell), "
+                "/etc/group=alle Gruppen, sudo -l=deine Rechte. "
+                "Mit sudo regierst du das System!",
+            ],
+        },
+        "ascii_art": [
+            "        👑  PALAST  👑        ",
+            "       / der Benutzer \\      ",
+            "      | 🏛️  |  🏛️  |  🏛️ |   ",
+            "      |   ==  THRON  ==  |   ",
+            "       \\_________________/   ",
+            "         *  Willkommen  *    ",
+        ],
+        "quests": [
+            {
+                "id": "whoami_pal",
+                "ziel": "Wer regiert? whoami",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "whoami"
+                ),
+                "belohnung": "📜 Schriftrolle der Herrschaft",
+                "lernziel": (
+                    "whoami zeigt aktuellen Benutzernamen. "
+                    "In Skripten: pruefen ob man root ist."
+                ),
+            },
+            {
+                "id": "id_pal",
+                "ziel": "Zeige alle IDs: id",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "id"
+                ),
+                "belohnung": "📜 Schriftrolle der Identitaet",
+                "lernziel": (
+                    "id zeigt uid=N(name) gid=N(name) groups=... "
+                    "Unverzichtbar fuer Berechtigungsprobleme."
+                ),
+            },
+            {
+                "id": "groups_pal",
+                "ziel": "Zeige Gruppen: groups",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "groups"
+                ),
+                "belohnung": "📜 Schriftrolle der Zungen",
+                "lernziel": (
+                    "groups zeigt Mitgliedschaften. "
+                    "sudo-Gruppe = Admin. docker-Gruppe = Docker nutzen."
+                ),
+            },
+            {
+                "id": "passwd_pal",
+                "ziel": "Zeige Benutzer: cat /etc/passwd | head -5",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "cat"
+                    and "passwd" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle des Volkes",
+                "lernziel": (
+                    "/etc/passwd: name:x:uid:gid:info:home:shell. "
+                    "Passwort-Hashes in /etc/shadow."
+                ),
+            },
+            {
+                "id": "group_pal",
+                "ziel": "Zeige Gruppen-Datei: cat /etc/group | head -10",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "cat"
+                    and "group" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle der Gemeinden",
+                "lernziel": (
+                    "/etc/group: gruppenname:x:gid:mitglieder. "
+                    "sudo-Gruppe = Administrator."
+                ),
+            },
+            {
+                "id": "sudol_pal",
+                "ziel": "Pruefe sudo-Rechte: sudo -l",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "sudo"
+                    and len(cmd.split()) >= 2
+                ),
+                "belohnung": "📜 Schriftrolle der Macht",
+                "lernziel": (
+                    "sudo -l zeigt erlaubte sudo-Befehle. "
+                    "sudo = 'super user do'. Nur mit sudo-Gruppe!"
+                ),
+            },
+        ],
+        "dateien": [
+            {
+                "dateiname": "benutzerhandbuch.txt",
+                "inhalt": (
+                    "Benutzerverwaltung:\n"
+                    "• whoami - Aktueller Benutzer\n"
+                    "• id - User-ID und Gruppen\n"
+                    "• sudo BEFEHL - Als Root ausfuehren\n"
+                    "• useradd NAME - Neuen Benutzer (root)\n"
+                ),
+            },
+        ],
+    },
+
+    "bibliothekskeller": {
+        "name": "Keller der Textzauberer",
+        "emoji": "📜",
+        "beschreibung": (
+            "Im dunklen Keller der Textzauberer verarbeiten wir Texte mit mächtigen Werkzeugen: "
+            "sort, uniq, cut, awk, sed und tr. "
+            "Textzauberer Awk kennt alle Geheimnisse der Textverarbeitung."
+        ),
+        "ausgaenge": {
+            "bibliothek": "Bibliothek",
+        },
+        "npc": {
+            "name": "Textzauberer Awk",
+            "bild": "🪬",
+            "dialoge": [
+                "Psst... ich bin Textzauberer Awk! 🪬 "
+                "Hier unten im Keller verarbeiten wir Texte mit uralter Magie. "
+                "Dein erster Zauber: sort bringt Ordnung ins Chaos. "
+                "Sortiere namen.txt und staune über die Wirkung!",
+                "Gut! Aber Vorsicht: uniq entfernt nur BENACHBARTE Duplikate "
+                "– deshalb immer sort | uniq! 📜 "
+                "Und cut schneidet Spalten heraus: cut -d',' -f1 liest das erste Feld einer CSV-Datei. "
+                "Meistere die Grundzauber!",
+                "Jetzt zur Hochmagie! awk verarbeitet Felder: $1 ist das erste Feld, $NF das letzte. 🪬 "
+                "sed ersetzt Text mit s/ALT/NEU/g. "
+                "Und tr wandelt Zeichen um: a-z in A-Z für Großbuchstaben "
+                "– mächtig und präzise!",
+                "MEISTERHAFT! 🪬 Du beherrschst alle Textzauber: "
+                "sort|uniq für Duplikate, cut für CSV-Spalten, awk für Feldverarbeitung, "
+                "sed für Textersetzung, tr für Zeichenwandlung. "
+                "Die Meister-Pipeline verbindet alles zu einem Werk! "
+                "Du bist nun Textzauberer des Kellerlabors!",
+            ],
+        },
+        "ascii_art": [
+            "  ~~~~ KELLER der TEXTE ~~~~  ",
+            "  | 📜   Runen und Magie   |  ",
+            "  | ░░ sort | uniq | awk ░░|  ",
+            "  | ░░  sed  |  tr | cut ░░|  ",
+            "  |_________________________|  ",
+            "   ~~ Awk beobachtet dich ~~  ",
+        ],
+        "quests": [
+            {
+                "id": "sort_kell",
+                "ziel": "Sortiere Namen: sort namen.txt",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "sort"
+                    and len(cmd.split()) >= 2
+                ),
+                "belohnung": "📜 Schriftrolle der Ordnung",
+                "lernziel": (
+                    "sort sortiert alphabetisch. "
+                    "-r=umgekehrt, -n=numerisch, -k 2=nach Spalte 2."
+                ),
+            },
+            {
+                "id": "uniq_kell",
+                "ziel": "Entferne Duplikate: sort namen.txt | uniq",
+                "check": lambda cmd, out, p: "uniq" in cmd,
+                "belohnung": "📜 Schriftrolle der Einzigartigkeit",
+                "lernziel": (
+                    "uniq entfernt BENACHBARTE Duplikate. "
+                    "Immer: sort | uniq. uniq -c zaehlt Vorkommnisse."
+                ),
+            },
+            {
+                "id": "cut_kell",
+                "ziel": "Schneide Spalte: cut -d',' -f1 daten.csv",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "cut"
+                    and "-d" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle des Schnitts",
+                "lernziel": (
+                    "cut -d',' -f1 = Trennzeichen Komma, Feld 1. "
+                    "Perfekt fuer CSV-Dateien."
+                ),
+            },
+            {
+                "id": "awk_kell",
+                "ziel": "Drucke Spalte: awk '{print $1}' namen.txt",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "awk"
+                ),
+                "belohnung": "📜 Schriftrolle der Felder",
+                "lernziel": (
+                    "awk verarbeitet strukturierten Text. "
+                    "$1=Feld1, $NF=letztes Feld. Sehr maechtig!"
+                ),
+            },
+            {
+                "id": "sed_kell",
+                "ziel": "Ersetze Text: sed 's/Anna/Mia/g' namen.txt",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "sed"
+                ),
+                "belohnung": "📜 Schriftrolle des Wandels",
+                "lernziel": (
+                    "sed 's/SUCHE/ERSATZ/g' ersetzt alle Vorkommen. "
+                    "sed -i fuer direkte Dateibearbeitung."
+                ),
+            },
+            {
+                "id": "tr_kell",
+                "ziel": "Grossbuchstaben: cat namen.txt | tr 'a-z' 'A-Z'",
+                "check": lambda cmd, out, p: (
+                    "tr" in cmd
+                    and ("a-z" in cmd or "A-Z" in cmd)
+                ),
+                "belohnung": "📜 Schriftrolle der Verwandlung",
+                "lernziel": (
+                    "tr = translate characters. "
+                    "tr -d loescht Zeichen. tr -s quetscht Wiederholungen."
+                ),
+            },
+            {
+                "id": "pipeline_kell",
+                "ziel": (
+                    "Meister-Pipeline: "
+                    "cat daten.csv | cut -d',' -f1 | sort | uniq -c | sort -rn"
+                ),
+                "check": lambda cmd, out, p: (
+                    "|" in cmd
+                    and len([c for c in cmd.split("|") if c.strip()]) >= 3
+                ),
+                "belohnung": "📜 Schriftrolle der Meisterschaft",
+                "lernziel": (
+                    "Pipes kombinieren zu maechtigem Workflow. "
+                    "Dieses Muster sortiert und zaehlt Haeufigkeiten!"
+                ),
+            },
+        ],
+        "dateien": [
+            {
+                "dateiname": "namen.txt",
+                "inhalt": (
+                    "Anna\nBernd\nClara\nAnna\n"
+                    "Dieter\nBernd\nEva\nAnna\n"
+                ),
+            },
+            {
+                "dateiname": "daten.csv",
+                "inhalt": (
+                    "Anna,25,Berlin\n"
+                    "Bernd,30,Hamburg\n"
+                    "Clara,28,Berlin\n"
+                    "Dieter,35,Muenchen\n"
+                ),
+            },
+        ],
+    },
+
+    "garten": {
+        "name": "Garten der Verknuepfungen",
+        "emoji": "🌸",
+        "beschreibung": (
+            "Im Garten der Verknüpfungen wachsen symbolische Links wie Blumen. "
+            "Gärtnerin Fiona zeigt dir ln, find mit verschiedenen Optionen "
+            "und du – Werkzeuge für erweiterte Dateioperationen."
+        ),
+        "ausgaenge": {
+            "markt": "Markt",
+            "bibliothekskeller": "Keller der Textzauberer",
+        },
+        "npc": {
+            "name": "Gaertnerin Fiona",
+            "bild": "🌺",
+            "dialoge": [
+                "Willkommen in meinem Garten! 🌺 "
+                "Ich bin Fiona, und hier wachsen Verknüpfungen wie Blumen. "
+                "ln -s erstellt symbolische Links – wie Wegweiser zu Dateien. "
+                "Dann zeige sie mit ls -la und entdecke den Pfeil (->)!",
+                "Wunderschön! 🌸 Jetzt erkunde deinen Garten mit find. "
+                "find -type f findet nur Dateien, -size +1k findet große Dateien, "
+                "-mtime -1 findet frisch geänderte. "
+                "Jede Option ist eine andere Spur durch den Garten!",
+                "Dein Garten blüht! 🌺 "
+                "Das große Wissen: ln -s für symbolische Links (Änderungen wirken auf beide!), "
+                "ls -la zeigt Pfeile (->), find -type/-size/-mtime für gezielte Suche, "
+                "du -sh für Größencheck. "
+                "Mit diesen Werkzeugen verlierst du dich nie mehr im Dateisystem!",
+            ],
+        },
+        "ascii_art": [
+            "    🌸      GARTEN      🌸    ",
+            "  🌺 . 🌿 . 🌼 . 🌿 . 🌼 . 🌺  ",
+            "  | 🌳   Verknuepfungen  🌳 |  ",
+            "  |    find  .  ln  .  du  |  ",
+            "   \\_______________________/  ",
+            "    🌸    Willkommen!    🌸   ",
+        ],
+        "quests": [
+            {
+                "id": "symlink_gar",
+                "ziel": "Erstelle Symlink: ln -s preisliste.txt preis_link.txt",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "ln"
+                    and "-s" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle der Verbindung",
+                "lernziel": (
+                    "ln -s = symbolischer Link (Verknuepfung). "
+                    "Aenderungen wirken auf beide!"
+                ),
+            },
+            {
+                "id": "lsla_gar",
+                "ziel": "Sieh den Symlink: ls -la",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "ls"
+                    and "-la" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle des Zeigers",
+                "lernziel": (
+                    "ls -la zeigt Symlinks mit -> Ziel. "
+                    "l am Anfang der Rechte = Link."
+                ),
+            },
+            {
+                "id": "findtype_gar",
+                "ziel": "Finde Dateien: find . -type f",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "find"
+                    and "-type" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle der Dateien",
+                "lernziel": (
+                    "find -type f = nur Dateien, "
+                    "-type d = nur Ordner, -type l = nur Links."
+                ),
+            },
+            {
+                "id": "findsize_gar",
+                "ziel": "Finde grosse Dateien: find . -size +1k",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "find"
+                    and "-size" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle der Masse",
+                "lernziel": (
+                    "find -size +1k = groesser als 1 Kilobyte. "
+                    "+1M = groesser 1MB. c=Bytes, k=KB, M=MB."
+                ),
+            },
+            {
+                "id": "findmtime_gar",
+                "ziel": "Finde neue Dateien: find . -mtime -1",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "find"
+                    and "-mtime" in cmd
+                ),
+                "belohnung": "📜 Schriftrolle der Neuheit",
+                "lernziel": (
+                    "find -mtime -1 = letzten 24h geaendert. "
+                    "-mtime +7 = aelter als 7 Tage."
+                ),
+            },
+            {
+                "id": "du_gar",
+                "ziel": "Groesse anzeigen: du -sh .",
+                "check": lambda cmd, out, p: (
+                    bool(cmd.split())
+                    and cmd.split()[0] == "du"
+                ),
+                "belohnung": "📜 Schriftrolle der Totalgroesse",
+                "lernziel": (
+                    "du -sh . = Groesse aktueller Ordner. "
+                    "du -sh * = jedes Element. Unverzichtbar bei Platzmangel!"
+                ),
+            },
+        ],
+        "dateien": [
+            {
+                "dateiname": "gartenbuch.txt",
+                "inhalt": (
+                    "Erweiterte Dateioperationen:\n"
+                    "ln -s = Symlink\n"
+                    "find -type f = nur Dateien\n"
+                    "find -size +1k = nach Groesse\n"
+                    "du -sh = Ordnergroesse\n"
+                ),
+            },
+        ],
+    },
 }
+GESAMT_QUESTS = sum(len(r.get('quests', [])) for r in RAEUME.values())
+
 
 # ── Spielzustand ───────────────────────────────────────────────────────────────
 class Spiel:
@@ -895,7 +2130,7 @@ def anim_drachen_sieg(spiel: Spiel):
     print(c(f"║{'SIEG FUER BINARIA!'.center(W-2)}║", F.GELB + F.FETT))
     print(c('╠' + '═' * (W - 2) + '╣', F.ROT + F.FETT))
     print()
-    langsam(f"{spiel.spielerin}! Du hast alle 30 Schriftrollen gesammelt!", F.PINK, 0.04)
+    langsam(f"{spiel.spielerin}! Du hast alle {GESAMT_QUESTS} Schriftrollen gesammelt!", F.PINK, 0.04)
     langsam("Den maechtigen Drachen Remirf besiegt!", F.ROT, 0.04)
     langsam("Das Koenigreich Binaria ist fuer immer gerettet!", F.WEISS, 0.03)
     print()
@@ -992,7 +2227,9 @@ def welt_aufbauen(basis: Path):
     # Explizite Verzeichnisstruktur (hoehle liegt innerhalb von wald)
     for raum_id in ("dorf", "wald", "see", "markt",
                     "bibliothek", "labor", "festung",
-                    "bergpass", "hafen", "turm", "drachenfestung"):
+                    "bergpass", "hafen", "turm", "drachenfestung",
+                    "bibliothekskeller", "schmiede", "sternwarte",
+                    "akademie", "taverne", "magierschule", "palast", "garten"):
         (basis / raum_id).mkdir(exist_ok=True)
     (basis / "wald" / "hoehle").mkdir(exist_ok=True)
 
@@ -1005,6 +2242,61 @@ def welt_aufbauen(basis: Path):
         "GESUCHT: Tapfere Abenteurerin!\n"
         "Dreissig Schriftrollen muessen gerettet werden!\n"
         "Melde dich beim Aeltesten Finn.\n"
+    )
+    schreibe(basis / "schmiede" / "lagerliste.txt",
+        "Vorraete in der Schmiede:\n"
+        "- Eisen x 50\n"
+        "- Kohle x 30\n"
+        "- Kupfer x 20\n"
+    )
+    schreibe(basis / "sternwarte" / "sternenkarte.txt",
+        "=== Systembeobachtung ===\n"
+        "uname, df, free, du, date, cal\n"
+    )
+    schreibe(basis / "akademie" / "variablen.txt",
+        "Wichtige Umgebungsvariablen:\n"
+        "$HOME - Home-Verzeichnis\n"
+        "$USER - Benutzername\n"
+        "$PATH - Suchpfad\n"
+        "$SHELL - Shell-Pfad\n"
+    )
+    schreibe(basis / "taverne" / "trickliste.txt",
+        "Shell-Tricks:\n"
+        "Strg+C - Abbrechen\n"
+        "Strg+L - Leeren\n"
+        "Strg+A - Zeilenanfang\n"
+        "Tab - Autovervollstaendigung\n"
+        "Pfeil-Oben - Vorheriger Befehl\n"
+    )
+    schreibe(basis / "magierschule" / "zauber_vorlage.sh",
+        "#!/bin/bash\n"
+        "NAME='Mia'\n"
+        "echo Hallo $NAME\n"
+        "for i in 1 2 3; do echo $i; done\n"
+    )
+    schreibe(basis / "palast" / "benutzerhandbuch.txt",
+        "Benutzerverwaltung:\n"
+        "whoami - Aktueller Benutzer\n"
+        "id - User-ID und Gruppen\n"
+        "sudo BEFEHL - Als Root ausfuehren\n"
+        "useradd NAME - Neuen Benutzer (root)\n"
+    )
+    schreibe(basis / "bibliothekskeller" / "namen.txt",
+        "Anna\nBernd\nClara\nAnna\n"
+        "Dieter\nBernd\nEva\nAnna\n"
+    )
+    schreibe(basis / "bibliothekskeller" / "daten.csv",
+        "Anna,25,Berlin\n"
+        "Bernd,30,Hamburg\n"
+        "Clara,28,Berlin\n"
+        "Dieter,35,Muenchen\n"
+    )
+    schreibe(basis / "garten" / "gartenbuch.txt",
+        "Erweiterte Dateioperationen:\n"
+        "ln -s = Symlink\n"
+        "find -type f = nur Dateien\n"
+        "find -size +1k = nach Groesse\n"
+        "du -sh = Ordnergroesse\n"
     )
     schreibe(basis / "see" / "fels.txt",
         "=== Alte Inschrift ===\n"
@@ -1230,7 +2522,7 @@ def spielschleife(spiel: Spiel):
         if basis_cmd == "inventar":
             if spiel.scrolls:
                 zeilen = "\n".join(f"  {s}" for s in spiel.scrolls)
-                nachricht = f"📚 Deine Schriftrollen ({len(spiel.scrolls)}/30):\n{zeilen}"
+                nachricht = f"📚 Deine Schriftrollen ({len(spiel.scrolls)}/{GESAMT_QUESTS}):\n{zeilen}"
             else:
                 nachricht = "Du hast noch keine Schriftrollen.\nSpreche mit einem NPC (schau) um eine Quest zu bekommen!"
             spiel.terminal.append((cmd, ''))
@@ -1239,7 +2531,7 @@ def spielschleife(spiel: Spiel):
         if basis_cmd == "status":
             total = sum(len(r.get("quests", [])) for r in RAEUME.values())
             getan = len(spiel.abschluss)
-            nachricht = f"Quests: {getan}/{total}   Schriftrollen: {len(spiel.scrolls)}/30\nBesuche alle Orte um alle Schriftrollen zu finden!"
+            nachricht = f"Quests: {getan}/{total}   Schriftrollen: {len(spiel.scrolls)}/{GESAMT_QUESTS}\nBesuche alle Orte um alle Schriftrollen zu finden!"
             spiel.terminal.append((cmd, ''))
             continue
 
@@ -1351,7 +2643,7 @@ def spielschleife(spiel: Spiel):
         spiel.speichern()
 
         # Sieg-Check: alle 30 Schriftrollen gesammelt
-        if len(spiel.scrolls) >= 30:
+        if len(spiel.scrolls) >= GESAMT_QUESTS:
             time.sleep(0.8)
             # Prüfe ob letzter Scroll aus der Drachenfestung kommt (epischer Sieg)
             letzter_qid = list(spiel.abschluss)[-1] if spiel.abschluss else ""
@@ -1365,7 +2657,7 @@ def spielschleife(spiel: Spiel):
                 print(c(f"║{'🎉  DER FLUCH IST GEBROCHEN!  🎉'.center(W-2)}║", F.GELB + F.FETT))
                 print(c('╚' + '═' * (W - 2) + '╝', F.GELB + F.FETT))
                 print()
-                langsam(f"{spiel.spielerin}! Du hast alle 30 Schriftrollen gesammelt!", F.PINK, 0.04)
+                langsam(f"{spiel.spielerin}! Du hast alle {GESAMT_QUESTS} Schriftrollen gesammelt!", F.PINK, 0.04)
                 langsam("Das Koenigreich Binaria ist gerettet! Die Bewohner jubeln!", F.WEISS, 0.03)
                 print()
                 print(c("  Was du gelernt hast:", F.GELB + F.FETT))
