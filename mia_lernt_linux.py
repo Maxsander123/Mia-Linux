@@ -252,8 +252,8 @@ RAEUME = {
             "bild": "🎩",
             "dialoge": [
                 "Ich handele mit Waren – ich kann sie kopieren!\n"
-                "Probiere: cp fels.txt kopie.txt\n"
-                "(Zuerst cd see, dann zurück, oder nimm eine andere Datei!)",
+                "Auf dem Markt liegt schon eine Datei.\n"
+                "Probiere: cp preisliste.txt kopie.txt",
                 "Perfekt! Und verschieben oder umbenennen:\n"
                 "mv kopie.txt neues_exemplar.txt",
                 "Meisterhaft! Du bist eine echte Händlerin!\n"
@@ -339,7 +339,8 @@ def zeige_bildschirm(spiel: Spiel, nachricht: str = '', zeige_dialog: bool = Fal
     npc    = raum["npc"]
     kunst  = KUNST.get(spiel.raum_id(), KUNST["dorf"])
 
-    scrolls_str = f"📜 {len(spiel.scrolls)}/7"
+    total_quests = sum(len(r.get("quests", [])) for r in RAEUME.values())
+    scrolls_str = f"📜 {len(spiel.scrolls)}/{total_quests}"
     pos_str     = raum["name"]
 
     # ── Kopfleiste ─────────────────────────────────────────────────────────────
@@ -478,6 +479,55 @@ def anim_sieg():
         time.sleep(0.2)
 
 
+# ── Dateisystem-Konzepterklärung ──────────────────────────────────────────────
+
+def konzept_erklarung(spiel: 'Spiel | None' = None) -> str:
+    """Gibt eine Erklärung des Dateisystems als String zurück."""
+    b = spiel.basis if spiel else Path.home() / "linux_abenteuer"
+
+    zeilen = [
+        c("📚 DAS DATEISYSTEM – So funktioniert es:", F.GELB + F.FETT),
+        "",
+        c("  Denk dir den Computer wie ein riesiges Gebäude vor:", F.WEISS),
+        c("  Jeder Ordner ist ein Zimmer, jede Datei ist ein Dokument.", F.WEISS),
+        "",
+        c("  Dein Abenteuer-Ordner sieht so aus:", F.CYAN),
+        "",
+        c(f"  📦 {b.parent.name}/", F.GRAU) + c("                    ← Home-Verzeichnis", F.GRAU),
+        c(f"  └── 📦 {b.name}/", F.WEISS) + c("             ← Unser Spielbereich", F.WEISS),
+        c("       ├── 🏠 dorf/", F.GELB) + c("            ← Ordner (= Zimmer)", F.GRAU),
+        c("       │   └── 📄 aushang.txt", F.WEISS) + c("  ← Datei (= Dokument)", F.GRAU),
+        c("       ├── 🌲 wald/", F.GRUEN) + c("            ← noch ein Ordner", F.GRAU),
+        c("       │   └── 📦 hoehle/", F.CYAN) + c("       ← Ordner im Ordner!", F.GRAU),
+        c("       ├── 🌊 see/", F.BLAU),
+        c("       └── 🏪 markt/", F.GELB),
+        "",
+        c("  ┌─────────────────────────────────────────────┐", F.CYAN),
+        c("  │  WICHTIGE BEGRIFFE:                         │", F.CYAN + F.FETT),
+        c("  │                                             │", F.CYAN),
+        c("  │  Ordner / Verzeichnis  = Container für      │", F.WEISS),
+        c("  │                          Dateien & Ordner   │", F.WEISS),
+        c("  │  Datei                 = Inhalt             │", F.WEISS),
+        c("  │                          (Text, Bilder...)  │", F.WEISS),
+        c("  │  Pfad    = Adresse:  wald/hoehle/datei.txt  │", F.WEISS),
+        c("  │  /       = Trenner zwischen Ordnern         │", F.WEISS),
+        c("  │  ~       = Dein Home-Verzeichnis            │", F.WEISS),
+        c("  │  .       = Aktueller Ordner                 │", F.WEISS),
+        c("  │  ..      = Übergeordneter Ordner (zurück)   │", F.WEISS),
+        c("  └─────────────────────────────────────────────┘", F.CYAN),
+        "",
+        c("  💡 pwd zeigt deinen genauen Pfad, ls zeigt den Inhalt.", F.GELB),
+    ]
+    return "\n".join(zeilen)
+
+
+def zeige_konzept_screen():
+    """Zeigt die Konzepterklärung als eigenständigen Bildschirm."""
+    clr()
+    print(konzept_erklarung(None))
+    print()
+
+
 # ── Welt aufbauen ──────────────────────────────────────────────────────────────
 
 def welt_aufbauen(basis: Path):
@@ -513,6 +563,8 @@ def welt_aufbauen(basis: Path):
 # ── Befehl ausführen ──────────────────────────────────────────────────────────
 
 def fuehre_aus(cmd: str, cwd: Path) -> tuple[int, str, str]:
+    if not cwd.exists():
+        return 1, '', f'Ordner nicht gefunden: {cwd.name}'
     try:
         erg = subprocess.run(cmd, shell=True, capture_output=True, text=True,
                              cwd=str(cwd), timeout=8)
@@ -570,9 +622,23 @@ def spielschleife(spiel: Spiel):
         # ── Interne Spielbefehle ───────────────────────────────────────────────
         if basis_cmd in ("hilfe", "help", "?", "h"):
             nachricht = (
-                "BEFEHLE: ls │ pwd │ cd [ort] │ mkdir │ touch │ cat │ echo │ cp │ mv │ rm\n"
-                "SPIEL:   schau │ inventar │ status │ karte │ beenden\n"
-                "TIPP:    'schau' spricht mit dem NPC – er erklärt die nächste Aufgabe!"
+                "LINUX-BEFEHLE:\n"
+                "  ls          – Ordnerinhalt anzeigen\n"
+                "  pwd         – Aktuellen Pfad anzeigen\n"
+                "  cd [ort]    – Woanders hingehen (z.B. cd wald)\n"
+                "  mkdir name  – Neuen Ordner erstellen\n"
+                "  touch x.txt – Neue Datei erstellen\n"
+                "  cat x.txt   – Dateiinhalt lesen\n"
+                "  echo 't' >f – Text in Datei schreiben\n"
+                "  cp von nach – Datei kopieren\n"
+                "  mv von nach – Datei verschieben/umbenennen\n"
+                "  rm x.txt    – Datei löschen\n"
+                "SPIELBEFEHLE:\n"
+                "  schau  – Mit NPC sprechen (Quest holen)\n"
+                "  karte  – Weltkarte anzeigen\n"
+                "  inventar / status – Fortschritt anzeigen\n"
+                "  konzept – Dateisystem-Erklärung\n"
+                "  beenden – Spiel beenden (Fortschritt gespeichert)"
             )
             spiel.terminal.append((cmd, ''))
             continue
@@ -593,16 +659,22 @@ def spielschleife(spiel: Spiel):
 
         if basis_cmd == "inventar":
             if spiel.scrolls:
-                nachricht = "📚 Deine Schriftrollen:\n" + "\n".join(f"  {s}" for s in spiel.scrolls)
+                zeilen = "\n".join(f"  {s}" for s in spiel.scrolls)
+                nachricht = f"📚 Deine Schriftrollen ({len(spiel.scrolls)}/9):\n{zeilen}"
             else:
-                nachricht = "Du hast noch keine Schriftrollen. Löse Quests!"
+                nachricht = "Du hast noch keine Schriftrollen.\nSpreche mit einem NPC (schau) um eine Quest zu bekommen!"
             spiel.terminal.append((cmd, ''))
             continue
 
         if basis_cmd == "status":
             total = sum(len(r.get("quests", [])) for r in RAEUME.values())
             getan = len(spiel.abschluss)
-            nachricht = f"Quests: {getan}/{total}   Schriftrollen: {len(spiel.scrolls)}/7"
+            nachricht = f"Quests: {getan}/{total}   Schriftrollen: {len(spiel.scrolls)}/9\nBesuche alle Orte um alle Schriftrollen zu finden!"
+            spiel.terminal.append((cmd, ''))
+            continue
+
+        if basis_cmd == "konzept":
+            nachricht = konzept_erklarung(spiel)
             spiel.terminal.append((cmd, ''))
             continue
 
@@ -621,20 +693,32 @@ def spielschleife(spiel: Spiel):
             ziel = teile[1] if len(teile) > 1 else '..'
             if ziel == '..':
                 neues = spiel.aktuell.parent
+                # Wenn parent == basis oder außerhalb → automatisch nach dorf
                 if neues == spiel.basis or not str(neues).startswith(str(spiel.basis)):
-                    nachricht = "Du kannst nicht weiter zurück!"
+                    neues = spiel.basis / "dorf"
+                    anim_reise(spiel.aktuell.name, "dorf")
+                    spiel.aktuell = neues
+                    zeige_dialog  = True
+                    nachricht     = "Du gehst zurück zum Dorfplatz 🏠"
                 else:
                     anim_reise(spiel.aktuell.name, neues.name)
                     spiel.aktuell = neues
                     zeige_dialog  = True
                     nachricht     = f"Willkommen zurück in: {spiel.raum()['name']}"
             else:
+                # Zuerst relativ zum aktuellen Verzeichnis suchen,
+                # dann als Top-Level-Raum (z.B. "cd dorf" von überall)
                 neues = (spiel.aktuell / ziel).resolve()
+                if not neues.exists():
+                    neues = (spiel.basis / ziel).resolve()
                 if not str(neues).startswith(str(spiel.basis)):
                     nachricht = "⚠️  Das liegt außerhalb des Abenteuerlandes!"
                 elif not neues.exists():
-                    verfuegbar = [k for k in spiel.raum().get("ausgaenge", {})]
-                    nachricht = f"'{ziel}' gibt es hier nicht.\nVerfügbar: {', '.join(verfuegbar)}"
+                    verfuegbar = list(spiel.raum().get("ausgaenge", {}).keys())
+                    nachricht = (
+                        f"'{ziel}' gibt es hier nicht.\n"
+                        f"Ausgänge: {', '.join(verfuegbar)}"
+                    )
                 else:
                     anim_reise(spiel.aktuell.name, neues.name)
                     spiel.aktuell = neues
@@ -667,8 +751,8 @@ def spielschleife(spiel: Spiel):
 
         spiel.speichern()
 
-        # Sieg-Check
-        if len(spiel.scrolls) >= 7:
+        # Sieg-Check: alle 9 Schriftrollen gesammelt
+        if len(spiel.scrolls) >= 9:
             time.sleep(0.8)
             anim_sieg()
             clr()
@@ -677,7 +761,7 @@ def spielschleife(spiel: Spiel):
             print(c(f"║{'🎉  DER FLUCH IST GEBROCHEN!  🎉'.center(W-2)}║", F.GELB + F.FETT))
             print(c('╚' + '═' * (W - 2) + '╝', F.GELB + F.FETT))
             print()
-            langsam(f"{spiel.spielerin}! Du hast alle 7 Schriftrollen gesammelt!", F.PINK, 0.04)
+            langsam(f"{spiel.spielerin}! Du hast alle 9 Schriftrollen gesammelt!", F.PINK, 0.04)
             langsam("Das Dorf Binaria ist gerettet! Die Dorfbewohner jubeln!", F.WEISS, 0.03)
             print()
             print(c("  Was du gelernt hast:", F.GELB + F.FETT))
@@ -686,6 +770,7 @@ def spielschleife(spiel: Spiel):
                 time.sleep(0.1)
             print()
             print(c("  Spickzettel:  python3 mia_lernt_linux.py --spickzettel", F.GRAU))
+            print(c("  Konzepte:     python3 mia_lernt_linux.py --konzept", F.GRAU))
             print()
             break
 
@@ -777,6 +862,10 @@ def main():
         spickzettel()
         return
 
+    if '--konzept' in sys.argv or '-k' in sys.argv:
+        zeige_konzept_screen()
+        return
+
     if '--neustart' in sys.argv:
         savefile = Path.home() / "linux_abenteuer" / ".save.json"
         if savefile.exists():
@@ -792,11 +881,41 @@ def main():
 
     if not spiel.scrolls:
         clr()
+        # Kurze Dateisystem-Einführung für Erstbenutzer
+        print(c('╔' + '═' * (W - 2) + '╗', F.CYAN))
+        print(c(f"║{'  📚 Kurze Erklärung – was ist ein Dateisystem?  '.center(W-2)}║", F.CYAN + F.FETT))
+        print(c('╠' + '═' * (W - 2) + '╣', F.CYAN))
+        erklaerung = [
+            "Ein Computer speichert alles in Dateien und Ordnern –",
+            "genau wie ein echter Aktenschrank:",
+            "",
+            "  📦 Ordner  = Ein Fach im Aktenschrank",
+            "               Kann andere Ordner oder Dateien enthalten",
+            "  📄 Datei   = Ein Dokument im Fach",
+            "               Enthält Text, Bilder, Programme ...",
+            "",
+            "  Ordner können ineinander geschachtelt sein:",
+            "  musik/ → rock/ → song.mp3",
+            "",
+            "  pwd zeigt dir wo du gerade bist.",
+            "  ls  zeigt dir was in deinem Ordner liegt.",
+            "  cd  bringt dich in einen anderen Ordner.",
+            "",
+            "  Im Spiel = jeder Raum ist ein echter Ordner auf deinem PC!",
+            "  Tippe 'konzept' um diese Erklärung nochmal zu sehen.",
+        ]
+        for z in erklaerung:
+            row = f"  {z}"
+            print(c('║', F.CYAN) + c(row, F.WEISS) + ' ' * max(0, W - 2 - len(row)) + c('║', F.CYAN))
+        print(c('╚' + '═' * (W - 2) + '╝', F.CYAN))
         print()
         langsam(f"Willkommen, {name}! Dein Abenteuer beginnt!", F.PINK, 0.05)
-        langsam("Tippe 'schau' um mit dem NPC zu sprechen.", F.GELB, 0.04)
-        langsam("Tippe 'hilfe' für alle Befehle.", F.GELB, 0.04)
-        langsam("Tippe 'karte' für die Weltkarte.", F.GELB, 0.04)
+        print()
+        print(c("  💡 Tipps:", F.GELB + F.FETT))
+        print(c("     schau    → NPC ansprechen (Quest bekommen)", F.GELB))
+        print(c("     hilfe    → alle Befehle anzeigen", F.GELB))
+        print(c("     karte    → Weltkarte anzeigen", F.GELB))
+        print(c("     konzept  → Dateisystem-Erklärung", F.GELB))
         print()
         input(c("  ↵ Los geht's!", F.CYAN) + "  ")
 
