@@ -233,6 +233,14 @@ KUNST = {
         c("    └──────────────┘    ", F.GRAU),
         c("   ⏰  Zeituhr der Zeit  ", F.GELB + F.FETT),
     ],
+    "webwerkstatt": [
+        c("  <html>              </html>  ", F.GRUEN),
+        c("    <head> 🌐 </head>         ", F.GELB),
+        c("    <body>                    ", F.CYAN),
+        c("      <h1>Web-Werkstatt</h1>  ", F.WEISS + F.FETT),
+        c("    </body>                   ", F.CYAN),
+        c("  💻  HTML auf dem Server!   ", F.GRUEN + F.FETT),
+    ],
     "fernwelt": [
         c("  ╔═══════════════════════╗  ", F.CYAN),
         c("  ║  >_ SSH PORTAL  🌐   ║  ", F.CYAN + F.FETT),
@@ -1949,7 +1957,7 @@ RAEUME = {
             "wie man sich per SSH einloggt, Dateien uebertraegt und einen Webserver startet.\n"
             "Das ist keine Simulation – du verbindest dich mit einem ECHTEN Linux-Server!"
         ),
-        "ausgaenge": {"hafen": "Hafen", "schluesselschmiede": "Schlüsselschmiede", "zeituhr": "Zeituhr"},
+        "ausgaenge": {"hafen": "Hafen", "schluesselschmiede": "Schlüsselschmiede", "zeituhr": "Zeituhr", "webwerkstatt": "Webwerkstatt"},
         "npc": {
             "name": "Vera",
             "bild": "🌐",
@@ -2165,6 +2173,123 @@ RAEUME = {
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "crontab" and "-r" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"⏰ Schriftrolle der Ordnung",
                 "lernziel": "crontab -r entfernt ALLE Jobs! crontab -e oeffnet den Editor zum gezielten Bearbeiten.",
+            },
+        ],
+    },
+    "webwerkstatt": {
+        "name":        "Web-Werkstatt",
+        "emoji":       "💻",
+        "beschreibung": (
+            "Eine leuchtende Werkstatt voller schwebender HTML-Tags und bunter CSS-Farben.\n"
+            "Web-Zauberin Lyra lehrt dich, eine echte Website auf dem Server aufzubauen.\n"
+            "Du schreibst jedes Element mit echo direkt auf den Server –\n"
+            "und siehst das Ergebnis live im Browser!"
+        ),
+        "ausgaenge": {"fernwelt": "Fernwelt-Portal"},
+        "npc": {
+            "name": "Lyra",
+            "bild": "💻",
+            "dialoge": [
+                "Willkommen in der Web-Werkstatt! Ich bin Lyra, Web-Zauberin.\n"
+                "Wir bauen eine echte HTML-Seite auf deinem Server – Element fuer Element!\n"
+                "Verbinde dich zuerst per SSH, dann:\n"
+                "echo '<!DOCTYPE html>' > ~/website/index.html",
+                "Gut! Jetzt der HTML-Rahmen:\n"
+                "echo '<html><head><title>Mia Linux</title></head><body>' >> ~/website/index.html\n"
+                "Das >> haengt an ohne zu loeschen – das kennst du schon!",
+                "Eine Ueberschrift macht jede Seite lebendig:\n"
+                "echo '<h1>Willkommen auf Mias Linux-Server!</h1>' >> ~/website/index.html\n"
+                "h1 = groesste Ueberschrift. h2 bis h6 werden kleiner.",
+                "Jetzt ein Absatz und eine Liste:\n"
+                "echo '<p>Gelernte Befehle:</p>' >> ~/website/index.html\n"
+                "echo '<ul><li>SSH</li><li>SCP</li><li>crontab</li></ul>' >> ~/website/index.html",
+                "Ein Link zur naechsten Seite:\n"
+                "echo '<a href=\"about.html\">Ueber mich</a>' >> ~/website/index.html\n"
+                "echo '</body></html>' >> ~/website/index.html",
+                "Jetzt etwas Farbe mit CSS! Erstelle eine Stylesheet-Datei:\n"
+                "echo 'body{font-family:sans-serif;background:#1a1a2e;color:white;}' > ~/website/style.css\n"
+                "echo 'h1{color:#53c8ff;}a{color:#ff9f43;}' >> ~/website/style.css",
+                "Verknuepfe CSS mit HTML – fuege den link-Tag in den head ein:\n"
+                "Das machst du mit sed direkt auf dem Server:\n"
+                "sed -i 's|</head>|<link rel=\"stylesheet\" href=\"style.css\"></head>|' ~/website/index.html",
+                "Sieh dir das fertige Ergebnis an:\n"
+                "curl http://152.53.225.236:8080\n"
+                "Du siehst den rohen HTML-Code – im Browser sieht es noch viel besser aus!",
+                "Fantastisch! Du hast eine vollstaendige Website gebaut!\n"
+                "HTML fuer Struktur, CSS fuer Aussehen – das sind die Grundlagen des Webs.\n"
+                "Oeffne http://152.53.225.236:8080 im Browser um sie live zu sehen!",
+            ],
+        },
+        "quests": [
+            {
+                "id":       "html_doctype",
+                "ziel":     "Starte die HTML-Datei (SSH): echo '<!DOCTYPE html>' > ~/website/index.html",
+                "check":    lambda cmd, out, p: "DOCTYPE" in cmd and "index.html" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"💻 Schriftrolle des Dokumenttyps",
+                "lernziel": "<!DOCTYPE html> sagt dem Browser: das ist HTML5. Muss die ERSTE Zeile jeder HTML-Datei sein.",
+            },
+            {
+                "id":       "html_frame",
+                "ziel":     "Fuege den HTML-Rahmen ein (SSH): echo '<html><head><title>Mia Linux</title></head><body>' >> ~/website/index.html",
+                "check":    lambda cmd, out, p: "<html>" in cmd and "<title>" in cmd and ">>" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"💻 Schriftrolle der Struktur",
+                "lernziel": "html umschliesst alles. head = unsichtbare Infos (Titel, CSS). body = sichtbarer Inhalt.",
+            },
+            {
+                "id":       "html_h1",
+                "ziel":     "Fuege eine Ueberschrift ein (SSH): echo '<h1>Willkommen!</h1>' >> ~/website/index.html",
+                "check":    lambda cmd, out, p: "<h1>" in cmd and ">>" in cmd and "index.html" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"💻 Schriftrolle der Ueberschrift",
+                "lernziel": "h1 = groesste Ueberschrift. h2-h6 werden kleiner. Jede Seite sollte genau ein h1 haben.",
+            },
+            {
+                "id":       "html_paragraph",
+                "ziel":     "Fuege einen Absatz ein (SSH): echo '<p>Gelernte Befehle:</p>' >> ~/website/index.html",
+                "check":    lambda cmd, out, p: "<p>" in cmd and ">>" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"💻 Schriftrolle des Absatzes",
+                "lernziel": "p = paragraph = Absatz. Block-Element mit Abstand oben und unten.",
+            },
+            {
+                "id":       "html_list",
+                "ziel":     "Fuege eine Liste ein (SSH): echo '<ul><li>SSH</li><li>SCP</li></ul>' >> ~/website/index.html",
+                "check":    lambda cmd, out, p: "<ul>" in cmd and "<li>" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"💻 Schriftrolle der Liste",
+                "lernziel": "ul = unordered list (Punkte). ol = ordered list (Zahlen). li = list item.",
+            },
+            {
+                "id":       "html_link",
+                "ziel":     "Fuege einen Link ein (SSH): echo '<a href=\"about.html\">Ueber mich</a>' >> ~/website/index.html",
+                "check":    lambda cmd, out, p: "<a " in cmd and "href" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"💻 Schriftrolle der Verbindung",
+                "lernziel": "a = anchor = Link. href = hypertext reference. Das Grundprinzip des Internets!",
+            },
+            {
+                "id":       "html_close",
+                "ziel":     "Schliesse die HTML-Datei (SSH): echo '</body></html>' >> ~/website/index.html",
+                "check":    lambda cmd, out, p: "</body>" in cmd and "</html>" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"💻 Schriftrolle des Abschlusses",
+                "lernziel": "Jedes oefffnende Tag braucht ein schliessendes. </body> und </html> beenden das Dokument.",
+            },
+            {
+                "id":       "css_create",
+                "ziel":     "Erstelle CSS-Datei (SSH): echo 'body{background:#1a1a2e;color:white;}' > ~/website/style.css",
+                "check":    lambda cmd, out, p: "style.css" in cmd and "background" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"💻 Schriftrolle des Stils",
+                "lernziel": "CSS = Cascading Style Sheets. Selektor{Eigenschaft:Wert;} gibt Elementen Farbe und Form.",
+            },
+            {
+                "id":       "css_link",
+                "ziel":     "Verknuepfe CSS mit HTML via sed (SSH): sed -i 's|</head>|<link rel=\"stylesheet\" href=\"style.css\"></head>|' ~/website/index.html",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "sed" and "style.css" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"💻 Schriftrolle der Verknuepfung",
+                "lernziel": "sed -i ersetzt Text direkt in der Datei. Der link-Tag laedt das CSS in den Browser.",
+            },
+            {
+                "id":       "curl_html",
+                "ziel":     "Rufe deine fertige Seite ab: curl http://152.53.225.236:8080",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "curl" and "8080" in cmd and "152.53.225.236" in cmd,
+                "belohnung":"💻 Schriftrolle der Meisterin",
+                "lernziel": "curl zeigt den HTML-Quellcode. Im Browser sieht es mit CSS visuell aus. Oeffne die URL!",
             },
         ],
     },
@@ -2498,7 +2623,7 @@ def welt_aufbauen(basis: Path):
                     "bergpass", "hafen", "turm", "drachenfestung",
                     "bibliothekskeller", "schmiede", "sternwarte",
                     "akademie", "taverne", "magierschule", "palast", "garten",
-                    "fernwelt", "schluesselschmiede", "zeituhr"):
+                    "fernwelt", "schluesselschmiede", "zeituhr", "webwerkstatt"):
         (basis / raum_id).mkdir(exist_ok=True)
     (basis / "wald" / "hoehle").mkdir(exist_ok=True)
 
