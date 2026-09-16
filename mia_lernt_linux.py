@@ -482,30 +482,31 @@ def anim_sieg():
 
 def welt_aufbauen(basis: Path):
     basis.mkdir(exist_ok=True)
-    for raum_id in RAEUME:
+    # Explizite Verzeichnisstruktur (hoehle liegt innerhalb von wald)
+    for raum_id in ("dorf", "wald", "see", "markt"):
         (basis / raum_id).mkdir(exist_ok=True)
     (basis / "wald" / "hoehle").mkdir(exist_ok=True)
 
-    (basis / "dorf" / "aushang.txt").write_text(
+    def schreibe(pfad: Path, inhalt: str):
+        if not pfad.exists():
+            pfad.write_text(inhalt)
+
+    schreibe(basis / "dorf" / "aushang.txt",
         "GESUCHT: Tapfere Abenteurerin!\n"
         "Sieben Schriftrollen muessen gerettet werden!\n"
         "Melde dich beim Aeltesten Finn.\n"
     )
-    (basis / "see" / "fels.txt").write_text(
+    schreibe(basis / "see" / "fels.txt",
         "=== Alte Inschrift ===\n"
         "Das Wasser kennt alle Geheimnisse.\n"
         "Wer liest, der weiss. Wer weiss, der handelt.\n"
         "--- Marina, Hueterin des Sees ---\n"
     )
-    (basis / "markt" / "preisliste.txt").write_text(
+    schreibe(basis / "markt" / "preisliste.txt",
         "=== Preisliste ===\n"
         "Apfel       : 1 Muenze\n"
         "Zaubertrank : 5 Muenzen\n"
         "Karte       : 3 Muenzen\n"
-    )
-    (basis / "burg" / "info.txt").write_text(
-        "Achtung: Diese Burg steht seit 500 Jahren.\n"
-        "Betreten auf eigene Gefahr!\n"
     )
 
 
