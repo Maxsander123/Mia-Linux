@@ -241,6 +241,14 @@ KUNST = {
         c("    </body>                   ", F.CYAN),
         c("  💻  HTML auf dem Server!   ", F.GRUEN + F.FETT),
     ],
+    "deploymeisterei": [
+        c("  📝 edit  →  📤 scp  →  🌍  ", F.GELB),
+        c("  ╔════════════════════════╗  ", F.GRUEN),
+        c("  ║  ./deploy.sh  🚀       ║  ", F.GRUEN + F.FETT),
+        c("  ║  v1 → v2 → v3 → live  ║  ", F.CYAN),
+        c("  ╚════════════════════════╝  ", F.GRUEN),
+        c("  🚀   Deploymeisterei    🚀  ", F.GELB + F.FETT),
+    ],
     "fernwelt": [
         c("  ╔═══════════════════════╗  ", F.CYAN),
         c("  ║  >_ SSH PORTAL  🌐   ║  ", F.CYAN + F.FETT),
@@ -2185,7 +2193,7 @@ RAEUME = {
             "Du schreibst jedes Element mit echo direkt auf den Server –\n"
             "und siehst das Ergebnis live im Browser!"
         ),
-        "ausgaenge": {"fernwelt": "Fernwelt-Portal"},
+        "ausgaenge": {"fernwelt": "Fernwelt-Portal", "deploymeisterei": "Deploymeisterei"},
         "npc": {
             "name": "Lyra",
             "bild": "💻",
@@ -2290,6 +2298,102 @@ RAEUME = {
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "curl" and "8080" in cmd and "152.53.225.236" in cmd,
                 "belohnung":"💻 Schriftrolle der Meisterin",
                 "lernziel": "curl zeigt den HTML-Quellcode. Im Browser sieht es mit CSS visuell aus. Oeffne die URL!",
+            },
+        ],
+    },
+    "deploymeisterei": {
+        "name":        "Deploymeisterei",
+        "emoji":       "🚀",
+        "beschreibung": (
+            "Die Deploymeisterei ist das Ziel jeder Web-Entwicklerin!\n"
+            "Hier lernst du den echten Workflow: design → edit → deploy → check → repeat.\n"
+            "Du designst deine eigene Seite mit nano, schreibst ein Deploy-Skript\n"
+            "und kannst deine Website mit einem einzigen Befehl live schalten!"
+        ),
+        "ausgaenge": {"webwerkstatt": "Webwerkstatt"},
+        "npc": {
+            "name": "Aria",
+            "bild": "🚀",
+            "dialoge": [
+                "Willkommen in der Deploymeisterei! Ich bin Aria, Deploy-Meisterin.\n"
+                "Du hast HTML und CSS gelernt – jetzt lernst du den echten Workflow!\n"
+                "Starte mit deiner eigenen Seite: nano index.html\n"
+                "Schreib was du willst – Titel, Texte, Links. Deine Kreativitaet!",
+                "Gut! Jetzt deploy sie auf den Server:\n"
+                "scp index.html mia@152.53.225.236:~/website/\n"
+                "Und check das Ergebnis: curl http://152.53.225.236:8080",
+                "Echter Workflow: aendere jetzt etwas an deiner Seite!\n"
+                "Nutze sed um einen Text zu ersetzen:\n"
+                "sed -i 's/Willkommen/Hallo Welt/g' index.html\n"
+                "Dann nochmal deployen und pruefen!",
+                "Jetzt automatisieren wir das Deploy!\n"
+                "Erstelle ein Skript: nano deploy.sh\n"
+                "Inhalt: #!/bin/bash\\nscp index.html mia@152.53.225.236:~/website/\\necho 'Deployed!'",
+                "Mache es ausfuehrbar und starte es:\n"
+                "chmod +x deploy.sh\n"
+                "./deploy.sh\n"
+                "Ab jetzt: eine Aenderung, ein Befehl – fertig deployed!",
+                "Du bist eine echte Web-Entwicklerin!\n"
+                "Genau so arbeiten echte Teams: edit → git push → deploy script.\n"
+                "Deine Website ist live auf einem echten Server. Das ist REAL!",
+            ],
+        },
+        "quests": [
+            {
+                "id":       "nano_eigene_seite",
+                "ziel":     "Designe deine eigene Seite: nano index.html",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "nano" and "index.html" in cmd,
+                "belohnung":"🚀 Schriftrolle des Designs",
+                "lernziel": "nano oeffnet den Editor. Schreib eigenes HTML! Strg+O speichert, Strg+X beendet.",
+            },
+            {
+                "id":       "deploy_v1",
+                "ziel":     "Deploye Version 1: scp index.html mia@152.53.225.236:~/website/",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "scp" and "index.html" in cmd and "152.53.225.236" in cmd,
+                "belohnung":"🚀 Schriftrolle des ersten Deploys",
+                "lernziel": "scp = Secure Copy. Jedes Mal wenn du deployst, ersetzt du die alte Version auf dem Server.",
+            },
+            {
+                "id":       "check_v1",
+                "ziel":     "Pruefe deine Live-Seite: curl http://152.53.225.236:8080",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "curl" and "8080" in cmd and "deploy_v1" in p.abschluss,
+                "belohnung":"🚀 Schriftrolle der Kontrolle",
+                "lernziel": "Nach jedem Deploy pruefen! curl ist schnell. Oder oeffne http://152.53.225.236:8080 im Browser.",
+            },
+            {
+                "id":       "aendern_v2",
+                "ziel":     "Aendere etwas an deiner Seite mit sed: sed -i 's/ALTESTEXT/NEUESTEXT/g' index.html",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "sed" and "-i" in cmd and "index.html" in cmd,
+                "belohnung":"🚀 Schriftrolle der Version 2",
+                "lernziel": "sed -i aendert Dateien ohne Editor. Perfekt fuer schnelle Anpassungen im Deploy-Workflow.",
+            },
+            {
+                "id":       "deploy_v2",
+                "ziel":     "Deploye Version 2: scp index.html mia@152.53.225.236:~/website/",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "scp" and "index.html" in cmd and "aendern_v2" in p.abschluss,
+                "belohnung":"🚀 Schriftrolle des zweiten Deploys",
+                "lernziel": "Edit → Deploy → Check → repeat. Das ist der Kern jeder Web-Entwicklung!",
+            },
+            {
+                "id":       "deploy_script",
+                "ziel":     "Erstelle ein Deploy-Skript: nano deploy.sh",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "nano" and "deploy.sh" in cmd,
+                "belohnung":"🚀 Schriftrolle der Automatisierung",
+                "lernziel": "Skripte automatisieren wiederkehrende Aufgaben. Inhalt: #!/bin/bash + scp-Befehl.",
+            },
+            {
+                "id":       "chmod_deploy",
+                "ziel":     "Mache das Skript ausfuehrbar: chmod +x deploy.sh",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "chmod" and "+x" in cmd and "deploy.sh" in cmd,
+                "belohnung":"🚀 Schriftrolle der Ausfuehrung",
+                "lernziel": "chmod +x macht Skripte ausfuehrbar. Ohne +x: Permission denied!",
+            },
+            {
+                "id":       "run_deploy",
+                "ziel":     "Fuehre dein Deploy-Skript aus: ./deploy.sh",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "./deploy.sh",
+                "belohnung":"🚀 Schriftrolle der Meisterin",
+                "lernziel": "Ein Befehl, alles deployed. So arbeiten echte DevOps-Teams – nur mit mehr Schritten!",
             },
         ],
     },
@@ -2623,7 +2727,7 @@ def welt_aufbauen(basis: Path):
                     "bergpass", "hafen", "turm", "drachenfestung",
                     "bibliothekskeller", "schmiede", "sternwarte",
                     "akademie", "taverne", "magierschule", "palast", "garten",
-                    "fernwelt", "schluesselschmiede", "zeituhr", "webwerkstatt"):
+                    "fernwelt", "schluesselschmiede", "zeituhr", "webwerkstatt", "deploymeisterei"):
         (basis / raum_id).mkdir(exist_ok=True)
     (basis / "wald" / "hoehle").mkdir(exist_ok=True)
 
