@@ -5,8 +5,23 @@ RPG-Lernspiel für die Linux-Kommandozeile
 Steuere Mia durch eine Fantasiewelt und lerne dabei echte Linux-Befehle!
 """
 
-import os, sys, subprocess, time, json, textwrap
+import os, sys, subprocess, time, json, textwrap, configparser
 from pathlib import Path
+
+# ── VPS-Konfiguration (optional, aus ~/.mia_vps.ini) ──────────────────────────
+try:
+    import paramiko as _paramiko
+    PARAMIKO_OK = True
+except ImportError:
+    PARAMIKO_OK = False
+
+VPS_CONFIG: dict = {}
+_vps_cfg = Path.home() / ".mia_vps.ini"
+if _vps_cfg.exists():
+    _c = configparser.ConfigParser()
+    _c.read(_vps_cfg)
+    if "vps" in _c:
+        VPS_CONFIG = dict(_c["vps"])
 
 # ── Terminal-Breite ────────────────────────────────────────────────────────────
 try:
@@ -201,6 +216,14 @@ KUNST = {
         c("  |    find  .  ln  .  du  |  ", F.GRUEN),
         c("   \\_______________________/  ", F.GRUEN),
         c("    🌸    Willkommen!    🌸   ", F.GRUEN + F.FETT),
+    ],
+    "fernwelt": [
+        c("  ╔═══════════════════════╗  ", F.CYAN),
+        c("  ║  >_ SSH PORTAL  🌐   ║  ", F.CYAN + F.FETT),
+        c("  ║  ~~~~~~~~~~~~~~~~~~~~ ║  ", F.BLAU),
+        c("  ║  152.53.225.236:22   ║  ", F.GRUEN),
+        c("  ╚═══════════════════════╝  ", F.CYAN),
+        c("  ⚡   Fernwelt-Portal   ⚡  ", F.CYAN + F.FETT),
     ],
 }
 
@@ -811,7 +834,7 @@ RAEUME = {
             "wie Schiffe ein- und auslaufen. Hier lernt Mia, wie Computer miteinander\n"
             "kommunizieren und Dateien aus dem Internet heruntergeladen werden."
         ),
-        "ausgaenge": {"bergpass": "Bergpass", "turm": "Turm", "akademie": "Akademie"},
+        "ausgaenge": {"bergpass": "Bergpass", "turm": "Turm", "akademie": "Akademie", "fernwelt": "Fernwelt-Portal"},
         "npc": {
             "name": "Kapitaenin Sara",
             "bild": "🚢",
@@ -1901,6 +1924,92 @@ RAEUME = {
             },
         ],
     },
+    "fernwelt": {
+        "name":        "Fernwelt-Portal",
+        "emoji":       "🌐",
+        "beschreibung": (
+            "Ein schimmerndes Portal oeffnet sich vor dir – ein Tor zu einem echten\n"
+            "Server irgendwo in der Ferne. Knotenpunkt-Waerchterin Vera erklaert dir,\n"
+            "wie man sich per SSH einloggt, Dateien uebertraegt und einen Webserver startet.\n"
+            "Das ist keine Simulation – du verbindest dich mit einem ECHTEN Linux-Server!"
+        ),
+        "ausgaenge": {"hafen": "Hafen"},
+        "npc": {
+            "name": "Vera",
+            "bild": "🌐",
+            "dialoge": [
+                "Willkommen am Fernwelt-Portal! Ich bin Vera, Waerchterin der Verbindungen.\n"
+                "SSH ist der Schluesselbegriff fuer Fernzugriff: Secure Shell.\n"
+                "Tippe: ssh mia@152.53.225.236  – und du bist auf einem echten Server!",
+                "Gut gemacht! Jetzt lerne deinen neuen Server kennen.\n"
+                "Tippe im SSH-Modus: ls  – zeig mir was dort liegt.\n"
+                "Dann: mkdir website  – erstelle deinen Web-Ordner!\n"
+                "Mit 'exit' kehrst du ins Koenigreich zurueck.",
+                "Jetzt kommt SCP – Secure Copy! Erstelle zuerst eine HTML-Datei:\n"
+                "echo '<h1>Hallo Welt!</h1>' > index.html\n"
+                "Dann sende sie auf den Server:\n"
+                "scp index.html mia@152.53.225.236:~/website/",
+                "Fantastisch! Jetzt starte den Webserver:\n"
+                "ssh mia@152.53.225.236  – verbinde dich nochmal.\n"
+                "Dann: cd website && python3 -m http.server 8080 &\n"
+                "Dann 'exit' und teste mit: curl http://152.53.225.236:8080",
+                "Du hast es! Du kennst jetzt SSH, SCP und Webserver!\n"
+                "Das ist das Herzstueck von Linux-Server-Administration.\n"
+                "Jeder DevOps-Engineer, jeder Admin – alle benutzen genau das!",
+            ],
+        },
+        "quests": [
+            {
+                "id":       "ssh_connect",
+                "ziel":     "Verbinde dich per SSH: ssh mia@152.53.225.236",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ssh" and "152.53.225.236" in cmd,
+                "belohnung":"🌐 Schriftrolle der Fernverbindung",
+                "lernziel": "SSH = Secure Shell. Sicheres Einloggen auf Remote-Server. Standard in der Linux-Welt!",
+            },
+            {
+                "id":       "remote_ls",
+                "ziel":     "Schau dich auf dem Server um (im SSH-Modus tippe): ls",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ls" and getattr(p, "in_ssh", False),
+                "belohnung":"🌐 Schriftrolle des Fernblicks",
+                "lernziel": "ls funktioniert auf jedem Linux-Server gleich. Du kennst es schon – jetzt remote!",
+            },
+            {
+                "id":       "remote_mkdir",
+                "ziel":     "Erstelle den Website-Ordner (SSH-Modus): mkdir website",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "mkdir" and getattr(p, "in_ssh", False),
+                "belohnung":"🌐 Schriftrolle des Fernordners",
+                "lernziel": "mkdir auf einem Remote-Server – dein erster eigener Webspace-Ordner!",
+            },
+            {
+                "id":       "create_html",
+                "ziel":     "Erstelle eine HTML-Datei lokal: echo '<h1>Hallo Welt!</h1>' > index.html",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "echo" and ".html" in cmd and ">" in cmd,
+                "belohnung":"🌐 Schriftrolle des Webs",
+                "lernziel": "HTML = HyperText Markup Language. Die Sprache des Webs! Jede Website beginnt mit <h1>.",
+            },
+            {
+                "id":       "scp_upload",
+                "ziel":     "Lade die HTML-Datei auf den Server: scp index.html mia@152.53.225.236:~/website/",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "scp" and "152.53.225.236" in cmd and ".html" in cmd,
+                "belohnung":"🌐 Schriftrolle des Transports",
+                "lernziel": "SCP = Secure Copy. Wie cp, aber ueber SSH auf einen anderen Server. scp QUELLE ZIEL.",
+            },
+            {
+                "id":       "start_server",
+                "ziel":     "Starte den Webserver (SSH-Modus): cd website && python3 -m http.server 8080 &",
+                "check":    lambda cmd, out, p: "http.server" in cmd and "8080" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"🌐 Schriftrolle des Servers",
+                "lernziel": "python3 -m http.server PORT startet sofort einen Webserver. & = laeuft im Hintergrund.",
+            },
+            {
+                "id":       "web_check",
+                "ziel":     "Rufe deine Website ab: curl http://152.53.225.236:8080",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "curl" and "152.53.225.236" in cmd,
+                "belohnung":"🌐 Schriftrolle des World Wide Web",
+                "lernziel": "curl macht HTTP-Requests. Deine erste selbst gehostete Webseite ist live!",
+            },
+        ],
+    },
 }
 GESAMT_QUESTS = sum(len(r.get('quests', [])) for r in RAEUME.values())
 
@@ -1915,6 +2024,7 @@ class Spiel:
         self.abschluss  = set()
         self.terminal   = []
         self.dialog_idx = {}
+        self.in_ssh     = False  # True waehrend SSH-Modus aktiv
 
     def raum_id(self):
         name = self.aktuell.name
@@ -2229,7 +2339,7 @@ def welt_aufbauen(basis: Path):
                     "bibliothek", "labor", "festung",
                     "bergpass", "hafen", "turm", "drachenfestung",
                     "bibliothekskeller", "schmiede", "sternwarte",
-                    "akademie", "taverne", "magierschule", "palast", "garten"):
+                    "akademie", "taverne", "magierschule", "palast", "garten", "fernwelt"):
         (basis / raum_id).mkdir(exist_ok=True)
     (basis / "wald" / "hoehle").mkdir(exist_ok=True)
 
@@ -2436,6 +2546,102 @@ def pruefe_quest(spiel: Spiel, cmd: str, out: str) -> str:
     return ''
 
 
+# ── SSH-Mini-Shell ─────────────────────────────────────────────────────────────
+
+def ssh_modus(spiel: Spiel) -> list:
+    """Interaktive SSH-Session zum VPS. Gibt Liste von (cmd, out) zurueck."""
+    if not PARAMIKO_OK:
+        print(c("❌  paramiko nicht installiert! Tippe: pip3 install paramiko", F.ROT))
+        return []
+    if not VPS_CONFIG:
+        print(c("❌  ~/.mia_vps.ini nicht gefunden! Erstelle sie zuerst.", F.ROT))
+        return []
+
+    host = VPS_CONFIG.get("host", "")
+    user = VPS_CONFIG.get("user", "")
+    pw   = VPS_CONFIG.get("password", "")
+
+    clr()
+    print(c('╔' + '═' * (W - 2) + '╗', F.CYAN + F.FETT))
+    print(c(f"║  🌐  SSH-Verbindung zu {user}@{host}  ".ljust(W - 1) + "║", F.CYAN + F.FETT))
+    print(c('╠' + '═' * (W - 2) + '╣', F.CYAN))
+    print(c(f"║  Verbinde ...".ljust(W - 1) + "║", F.GRAU))
+
+    client = _paramiko.SSHClient()
+    client.set_missing_host_key_policy(_paramiko.AutoAddPolicy())
+    try:
+        client.connect(host, username=user, password=pw, timeout=15)
+    except Exception as e:
+        print(c(f"║  ❌ Verbindungsfehler: {e}".ljust(W - 1) + "║", F.ROT))
+        print(c('╚' + '═' * (W - 2) + '╝', F.CYAN))
+        return []
+
+    print(c(f"║  ✅ Verbunden! Tippe Befehle. 'exit' kehrt ins Spiel zurueck.".ljust(W - 1) + "║", F.GRUEN))
+    print(c('╚' + '═' * (W - 2) + '╝', F.CYAN))
+    print()
+
+    verlauf = []
+    spiel.in_ssh = True
+
+    while True:
+        try:
+            remote_cmd = input(c(f"{user}@{host}:~$ ", F.GRUEN + F.FETT)).strip()
+        except (EOFError, KeyboardInterrupt):
+            break
+
+        if not remote_cmd:
+            continue
+        if remote_cmd in ("exit", "quit", "logout"):
+            print(c("Verbindung getrennt. Willkommen zurueck im Koenigreich!", F.GELB))
+            break
+
+        _, stdout, stderr = client.exec_command(remote_cmd, timeout=15)
+        out = stdout.read().decode()
+        err = stderr.read().decode()
+        ausgabe = out or err or ""
+        if ausgabe:
+            print(ausgabe.rstrip())
+
+        verlauf.append((remote_cmd, out.strip()))
+
+    client.close()
+    spiel.in_ssh = False
+    return verlauf
+
+
+# ── SCP via paramiko ───────────────────────────────────────────────────────────
+
+def scp_upload(local_datei: Path, remote_pfad: str) -> str:
+    """Uebertraegt eine lokale Datei per SFTP auf den VPS."""
+    if not PARAMIKO_OK:
+        return "❌  paramiko nicht installiert!"
+    if not VPS_CONFIG:
+        return "❌  ~/.mia_vps.ini nicht gefunden!"
+    if not local_datei.exists():
+        return f"❌  Datei nicht gefunden: {local_datei.name}"
+
+    host = VPS_CONFIG.get("host", "")
+    user = VPS_CONFIG.get("user", "")
+    pw   = VPS_CONFIG.get("password", "")
+
+    client = _paramiko.SSHClient()
+    client.set_missing_host_key_policy(_paramiko.AutoAddPolicy())
+    try:
+        client.connect(host, username=user, password=pw, timeout=15)
+        sftp = client.open_sftp()
+        # Zielpfad aufloesen
+        ziel = remote_pfad.replace("~", f"/home/{user}")
+        # Zielordner anlegen falls noetig
+        ziel_dir = ziel.rsplit("/", 1)[0] if "/" in ziel else f"/home/{user}"
+        client.exec_command(f"mkdir -p {ziel_dir}")[1].read()
+        sftp.put(str(local_datei), ziel)
+        sftp.close()
+        client.close()
+        return f"✅  {local_datei.name} → {user}@{host}:{ziel}"
+    except Exception as e:
+        return f"❌  SCP-Fehler: {e}"
+
+
 # ── Hauptspielschleife ─────────────────────────────────────────────────────────
 
 def spielschleife(spiel: Spiel):
@@ -2485,6 +2691,8 @@ def spielschleife(spiel: Spiel):
                 "  ping IP     – Netzwerkverbindung testen\n"
                 "  wget URL    – Datei herunterladen\n"
                 "  curl URL    – HTTP-Anfrage senden\n"
+                "  ssh user@IP – Auf Remote-Server einloggen\n"
+                "  scp datei user@IP:~/pfad/ – Datei uebertragen\n"
                 "  nano datei  – Texteditor oeffnen\n"
                 "SPIELBEFEHLE:\n"
                 "  schau  – Mit NPC sprechen (Quest holen)\n"
@@ -2621,6 +2829,51 @@ def spielschleife(spiel: Spiel):
                 zeige_dialog = True
             else:
                 nachricht = out_nano
+            spiel.speichern()
+            continue
+
+        # ── ssh: interaktive Fernverbindung ────────────────────────────────────
+        if basis_cmd == "ssh":
+            # Quest fuer das Verbinden selbst pruefen
+            q_erg = pruefe_quest(spiel, cmd, "ssh gestartet")
+            if q_erg:
+                nachricht = q_erg
+                zeige_dialog = True
+            if not PARAMIKO_OK or not VPS_CONFIG:
+                if not PARAMIKO_OK:
+                    nachricht = "❌ paramiko fehlt. Tippe: pip3 install paramiko"
+                else:
+                    nachricht = "❌ ~/.mia_vps.ini nicht gefunden!"
+                spiel.terminal.append((cmd, nachricht))
+                spiel.speichern()
+                continue
+            # Starte SSH-Mini-Shell
+            verlauf = ssh_modus(spiel)
+            # Quest-Checks fuer alle Remote-Befehle
+            for r_cmd, r_out in verlauf:
+                rq = pruefe_quest(spiel, r_cmd, r_out)
+                if rq and not zeige_dialog:
+                    nachricht = rq
+                    zeige_dialog = True
+            spiel.terminal.append((cmd, f"SSH-Session: {len(verlauf)} Befehle"))
+            spiel.speichern()
+            continue
+
+        # ── scp: Datei auf VPS uebertragen ─────────────────────────────────────
+        if basis_cmd == "scp":
+            # Einfache Verarbeitung: scp LOKALDATEI user@host:ZIELPFAD
+            scp_teile = teile[1:] if len(teile) > 1 else []
+            if len(scp_teile) >= 2:
+                lok = spiel.aktuell / scp_teile[0]
+                ziel_pfad = scp_teile[-1].split(":", 1)[-1] if ":" in scp_teile[-1] else "~/website/"
+                ergebnis = scp_upload(lok, ziel_pfad)
+            else:
+                ergebnis = "Verwendung: scp DATEINAME mia@IP:~/ziel/"
+            q_erg = pruefe_quest(spiel, cmd, ergebnis)
+            nachricht = q_erg if q_erg else ergebnis
+            if q_erg:
+                zeige_dialog = True
+            spiel.terminal.append((cmd, ergebnis[:150]))
             spiel.speichern()
             continue
 
@@ -2780,9 +3033,12 @@ def spickzettel():
     print(c('║' + ' ' * (S - 2) + '║', F.CYAN))
 
     print(c(f"║  {c('NETZWERK', F.GELB + F.FETT):<{S+9}}║", F.CYAN))
-    row("ping -c 3 IP",    "Netzwerkverbindung testen")
-    row("wget URL",        "Datei herunterladen")
-    row("curl URL",        "HTTP-Anfrage senden")
+    row("ping -c 3 IP",       "Netzwerkverbindung testen")
+    row("wget URL",           "Datei herunterladen")
+    row("curl URL",           "HTTP-Anfrage senden")
+    row("ssh user@host",      "Auf Remote-Server einloggen")
+    row("scp datei user@h:~", "Datei per SSH uebertragen")
+    row("python3 -m http.server 8080", "Webserver starten")
     print(c('║' + ' ' * (S - 2) + '║', F.CYAN))
 
     print(c(f"║  {c('EDITOR & SKRIPTE', F.GELB + F.FETT):<{S+9}}║", F.CYAN))
