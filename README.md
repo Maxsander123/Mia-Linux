@@ -1,13 +1,15 @@
-# 🐧 Mia lernt Linux!
+# Mia lernt Linux!
 
-Ein spielerisches, interaktives Linux-Terminal-Tutorial auf Deutsch – für alle, die noch nie mit der Kommandozeile gearbeitet haben.
+Ein spielerisches, interaktives Linux-Terminal-Tutorial auf Deutsch – fuer alle, die noch nie mit der Kommandozeile gearbeitet haben.
 
 ## Was dich erwartet
 
-- **Split-Screen**: Links siehst du immer das Dateisystem, rechts den Terminal-Verlauf
-- **ASCII-Animationen**: Jeder Befehl wird grafisch dargestellt (Datei erscheint, verschwindet, bewegt sich...)
-- **Echte Übungen**: Du tippst echte Befehle – nichts ist simuliert
+- **12 Raeume** mit je 2-3 Quests = 30+ Aufgaben insgesamt
+- **Split-Screen**: Links das Dateisystem, rechts der Terminal-Verlauf
+- **ASCII-Animationen**: Jeder Befehl wird grafisch dargestellt
+- **Echte Uebungen**: Du tippst echte Befehle – nichts ist simuliert
 - **Sicher**: Alles passiert in `~/linux_uebungen` – nichts kann kaputtgehen
+- **Bosskampf**: Am Ende wartet die Drachenfestung
 
 ## Starten
 
@@ -15,27 +17,36 @@ Ein spielerisches, interaktives Linux-Terminal-Tutorial auf Deutsch – für all
 python3 mia_lernt_linux.py
 ```
 
-## Spickzettel anzeigen
+## Optionen
 
 ```bash
-python3 mia_lernt_linux.py --spickzettel
+python3 mia_lernt_linux.py --spickzettel    # Alle Befehle auf einen Blick
+python3 mia_lernt_linux.py --konzept        # Spielkonzept anzeigen
+python3 mia_lernt_linux.py --neustart       # Spielstand zuruecksetzen
 ```
+
+## Die 12 Raeume
+
+| Raum | Thema | Befehle |
+|------|-------|---------|
+| Dorf | Einstieg | `pwd`, `ls`, `cd` |
+| Wald | Navigation | `mkdir`, `cd`, `ls` |
+| Hoehle | Dateien erstellen | `touch`, `cat`, `echo` |
+| See | Dateiverwaltung | `cp`, `mv`, `rm` |
+| Markt | Grundlagen-Mix | `ls -a`, `--help` |
+| Bibliothek | Suchen & Filtern | `grep`, `find`, Pipes (`\|`) |
+| Labor | Berechtigungen | `chmod`, `ls -l` |
+| Festung | Prozesse | `ps`, `kill`, `top` |
+| Bergpass | Paketverwaltung | `apt`, `apt-get` |
+| Hafen | Netzwerk | `ping`, `wget`, `curl` |
+| Turm | Textbearbeitung | `nano`, Bash-Grundlagen |
+| Drachenfestung | Bosskampf | Alles zusammen |
 
 ## Was du lernst
 
-| Befehl | Was es macht |
-|--------|-------------|
-| `pwd` | Aktuellen Ordner anzeigen |
-| `ls` | Ordnerinhalt auflisten |
-| `cd` | In andere Ordner wechseln |
-| `mkdir` | Neuen Ordner erstellen |
-| `touch` | Neue Datei erstellen |
-| `cat` | Dateiinhalt lesen |
-| `echo` | Text ausgeben und in Dateien schreiben |
-| `cp` | Dateien kopieren |
-| `mv` | Dateien verschieben / umbenennen |
-| `rm` | Dateien löschen |
-| `--help` | Hilfe zu jedem Befehl |
+Navigation, Dateiverwaltung, Suchen und Filtern, Berechtigungen,
+Prozessverwaltung, Paketverwaltung, Netzwerktools und Textbearbeitung –
+das vollstaendige Linux/Ubuntu-Grundkurs-Curriculum.
 
 ## Voraussetzungen
 
