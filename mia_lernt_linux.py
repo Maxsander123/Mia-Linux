@@ -217,6 +217,22 @@ KUNST = {
         c("   \\_______________________/  ", F.GRUEN),
         c("    🌸    Willkommen!    🌸   ", F.GRUEN + F.FETT),
     ],
+    "schluesselschmiede": [
+        c("  🔑  🔑  🔑  🔑  🔑  🔑  ", F.GELB),
+        c("  ┌─────────────────────┐  ", F.BRAUN),
+        c("  │ ssh-keygen ed25519  │  ", F.GRUEN + F.FETT),
+        c("  │ ~/.ssh/id_ed25519   │  ", F.GRUEN),
+        c("  └─────────────────────┘  ", F.BRAUN),
+        c("  🔑  Schlüsselschmiede  🔑 ", F.GELB + F.FETT),
+    ],
+    "zeituhr": [
+        c("       ⏰  12  ⏰       ", F.GELB),
+        c("    ┌──────────────┐    ", F.GRAU),
+        c("    │  * * * * *   │    ", F.CYAN + F.FETT),
+        c("    │  cron jobs   │    ", F.CYAN),
+        c("    └──────────────┘    ", F.GRAU),
+        c("   ⏰  Zeituhr der Zeit  ", F.GELB + F.FETT),
+    ],
     "fernwelt": [
         c("  ╔═══════════════════════╗  ", F.CYAN),
         c("  ║  >_ SSH PORTAL  🌐   ║  ", F.CYAN + F.FETT),
@@ -1933,7 +1949,7 @@ RAEUME = {
             "wie man sich per SSH einloggt, Dateien uebertraegt und einen Webserver startet.\n"
             "Das ist keine Simulation – du verbindest dich mit einem ECHTEN Linux-Server!"
         ),
-        "ausgaenge": {"hafen": "Hafen"},
+        "ausgaenge": {"hafen": "Hafen", "schluesselschmiede": "Schlüsselschmiede", "zeituhr": "Zeituhr"},
         "npc": {
             "name": "Vera",
             "bild": "🌐",
@@ -2007,6 +2023,148 @@ RAEUME = {
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "curl" and "152.53.225.236" in cmd,
                 "belohnung":"🌐 Schriftrolle des World Wide Web",
                 "lernziel": "curl macht HTTP-Requests. Deine erste selbst gehostete Webseite ist live!",
+            },
+        ],
+    },
+    "schluesselschmiede": {
+        "name":        "Schlüsselschmiede",
+        "emoji":       "🔑",
+        "beschreibung": (
+            "Eine geheimnisvolle Werkstatt, in der magische Schluessel geschmiedet werden.\n"
+            "Schluesselmeister Klaus lehrt dich SSH-Key-Authentifizierung –\n"
+            "das Ende von Passwoertern! Mit einem Schluesselpaar loggst du dich\n"
+            "auf jedem Server ein, ohne je ein Passwort tippen zu muessen."
+        ),
+        "ausgaenge": {"fernwelt": "Fernwelt-Portal"},
+        "npc": {
+            "name": "Klaus",
+            "bild": "🔑",
+            "dialoge": [
+                "Willkommen in meiner Schmiede! Ich bin Schluesselmeister Klaus.\n"
+                "Passwoerter sind gefaehrlich – ein Schluessel ist viel sicherer!\n"
+                "Starte mit: ssh-keygen -t ed25519\n"
+                "Das erstellt ein Schluesselpaar: privat (geheim) + oeffentlich (teilbar).",
+                "Gut! Dein Schluessel liegt in ~/.ssh/\n"
+                "Sieh dir den oeffentlichen Schluessel an:\n"
+                "cat ~/.ssh/id_ed25519.pub\n"
+                "Dieser kann bedenkenlos weitergegeben werden!",
+                "Jetzt kopieren wir den Schluessel auf den Server.\n"
+                "Das Spiel erledigt ssh-copy-id automatisch fuer dich.\n"
+                "Tippe einfach: ssh-copy-id mia@152.53.225.236",
+                "Fantastisch! Ab jetzt kein Passwort mehr!\n"
+                "Teste es: ssh mia@152.53.225.236\n"
+                "Du wirst direkt eingeloggt – ohne Passwort!",
+                "Meisterhaft! Du kennst jetzt Public-Key-Authentifizierung.\n"
+                "So funktioniert GitHub, jeder Cloud-Server, alles!\n"
+                "Der private Schluessel bleibt NUR bei dir. Nie weitergeben!",
+            ],
+        },
+        "quests": [
+            {
+                "id":       "keygen",
+                "ziel":     "Erstelle ein SSH-Schluesselpaar: ssh-keygen -t ed25519",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ssh-keygen" and "ed25519" in cmd,
+                "belohnung":"🔑 Schriftrolle des Schluessels",
+                "lernziel": "ssh-keygen erstellt privaten + oeffentlichen Schluessel. -t ed25519 = moderner Algorithmus.",
+            },
+            {
+                "id":       "cat_pubkey",
+                "ziel":     "Zeige den oeffentlichen Schluessel: cat ~/.ssh/id_ed25519.pub",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "cat" and "id_ed25519.pub" in cmd,
+                "belohnung":"🔑 Schriftrolle des Oeffentlichen",
+                "lernziel": "Der oeffentliche Schluessel (.pub) darf auf Server kopiert werden. Der private bleibt geheim!",
+            },
+            {
+                "id":       "ssh_copy_id",
+                "ziel":     "Kopiere deinen Schluessel auf den Server: ssh-copy-id mia@152.53.225.236",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ssh-copy-id" and "152.53.225.236" in cmd,
+                "belohnung":"🔑 Schriftrolle der Installation",
+                "lernziel": "ssh-copy-id schreibt deinen Schluessel in ~/.ssh/authorized_keys auf dem Server.",
+            },
+            {
+                "id":       "ssh_nopasswd",
+                "ziel":     "Logge dich ohne Passwort ein: ssh mia@152.53.225.236",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ssh" and "152.53.225.236" in cmd,
+                "belohnung":"🔑 Schriftrolle der Freiheit",
+                "lernziel": "Public-Key-Auth: Server prueft ob dein privater Schluessel zum installierten passt. Kein Passwort!",
+            },
+            {
+                "id":       "ls_ssh_dir",
+                "ziel":     "Sieh deine gespeicherten Schluessel: ls -la ~/.ssh/",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ls" and ".ssh" in cmd,
+                "belohnung":"🔑 Schriftrolle des Gewölbes",
+                "lernziel": "~/.ssh/ enthaelt: id_ed25519 (privat!), id_ed25519.pub, known_hosts, authorized_keys.",
+            },
+        ],
+    },
+    "zeituhr": {
+        "name":        "Zeituhr der Automatik",
+        "emoji":       "⏰",
+        "beschreibung": (
+            "Eine riesige magische Uhr, deren Zahnraeder niemals stillstehen.\n"
+            "Chronistin Hora lehrt dich crontab – das Planen automatischer Aufgaben.\n"
+            "Befehle, die jede Minute, Stunde oder Nacht automatisch ausgefuehrt werden.\n"
+            "Das Herzstuck jeder Server-Automatisierung!"
+        ),
+        "ausgaenge": {"fernwelt": "Fernwelt-Portal"},
+        "npc": {
+            "name": "Hora",
+            "bild": "⏰",
+            "dialoge": [
+                "Willkommen an der Zeituhr! Ich bin Chronistin Hora.\n"
+                "Crontab plant Befehle die automatisch laufen – ohne dass du dabei sein musst!\n"
+                "Verbinde dich zuerst per SSH, dann schau was geplant ist:\n"
+                "Tippe im SSH-Modus: crontab -l",
+                "Das Crontab-Format ist: Minute Stunde Tag Monat Wochentag Befehl\n"
+                "* * * * *  = jede Minute. 0 * * * * = jede volle Stunde.\n"
+                "Erstelle deinen ersten Job (in SSH-Modus):\n"
+                "echo '* * * * * date >> ~/zeitlog.txt' | crontab -",
+                "Hervorragend! Jetzt liste deine geplanten Jobs auf:\n"
+                "crontab -l\n"
+                "Du siehst deinen neuen Eintrag. Der laeuft jetzt jede Minute!",
+                "Lies die automatisch erstellten Logs:\n"
+                "sleep 65 && cat ~/zeitlog.txt\n"
+                "Oder pruefe direkt: ls -la ~/zeitlog.txt",
+                "Du hast crontab gemeistert! Das nutzen Admins fuer:\n"
+                "Backups, Log-Rotation, Monitoring, automatische Updates.\n"
+                "Entferne alle Jobs wieder mit: crontab -r",
+            ],
+        },
+        "quests": [
+            {
+                "id":       "crontab_list",
+                "ziel":     "Zeige geplante Jobs (SSH-Modus): crontab -l",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "crontab" and "-l" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"⏰ Schriftrolle der Zeit",
+                "lernziel": "crontab -l = list. Zeigt alle geplanten automatischen Aufgaben des aktuellen Benutzers.",
+            },
+            {
+                "id":       "crontab_add",
+                "ziel":     "Plane einen Job: echo '* * * * * date >> ~/zeitlog.txt' | crontab -",
+                "check":    lambda cmd, out, p: "crontab" in cmd and "|" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"⏰ Schriftrolle der Planung",
+                "lernziel": "Format: MIN STD TAG MON WTAG BEFEHL. * = jeder Wert. | crontab - = direkt setzen ohne Editor.",
+            },
+            {
+                "id":       "crontab_verify",
+                "ziel":     "Pruefe den neuen Eintrag: crontab -l",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "crontab" and "-l" in cmd and getattr(p, "in_ssh", False) and "crontab_add" in p.abschluss,
+                "belohnung":"⏰ Schriftrolle der Bestaetigung",
+                "lernziel": "Immer nach Aenderungen crontab -l zur Kontrolle! Syntaxfehler verhindern die Ausfuehrung.",
+            },
+            {
+                "id":       "crontab_log",
+                "ziel":     "Lies das automatische Log: cat ~/zeitlog.txt",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "cat" and "zeitlog" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"⏰ Schriftrolle des Beweises",
+                "lernziel": ">> leitet Ausgabe an eine Datei an. So sammeln Cronjobs ihre Ergebnisse in Log-Dateien.",
+            },
+            {
+                "id":       "crontab_remove",
+                "ziel":     "Raeume auf und entferne alle Jobs: crontab -r",
+                "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "crontab" and "-r" in cmd and getattr(p, "in_ssh", False),
+                "belohnung":"⏰ Schriftrolle der Ordnung",
+                "lernziel": "crontab -r entfernt ALLE Jobs! crontab -e oeffnet den Editor zum gezielten Bearbeiten.",
             },
         ],
     },
@@ -2339,7 +2497,8 @@ def welt_aufbauen(basis: Path):
                     "bibliothek", "labor", "festung",
                     "bergpass", "hafen", "turm", "drachenfestung",
                     "bibliothekskeller", "schmiede", "sternwarte",
-                    "akademie", "taverne", "magierschule", "palast", "garten", "fernwelt"):
+                    "akademie", "taverne", "magierschule", "palast", "garten",
+                    "fernwelt", "schluesselschmiede", "zeituhr"):
         (basis / raum_id).mkdir(exist_ok=True)
     (basis / "wald" / "hoehle").mkdir(exist_ok=True)
 
@@ -2609,6 +2768,41 @@ def ssh_modus(spiel: Spiel) -> list:
     return verlauf
 
 
+# ── SSH-Key auf Server installieren ────────────────────────────────────────────
+
+def install_ssh_key() -> str:
+    """Kopiert den lokalen oeffentlichen SSH-Schluessel in authorized_keys auf dem VPS."""
+    if not PARAMIKO_OK:
+        return "❌  paramiko nicht installiert!"
+    if not VPS_CONFIG:
+        return "❌  ~/.mia_vps.ini nicht gefunden!"
+
+    pub_key_path = Path.home() / ".ssh" / "id_ed25519.pub"
+    if not pub_key_path.exists():
+        pub_key_path = Path.home() / ".ssh" / "id_rsa.pub"
+    if not pub_key_path.exists():
+        return "❌  Kein SSH-Schluessel gefunden. Erstelle erst einen mit: ssh-keygen -t ed25519"
+
+    pub_key = pub_key_path.read_text().strip()
+    host = VPS_CONFIG.get("host", "")
+    user = VPS_CONFIG.get("user", "")
+    pw   = VPS_CONFIG.get("password", "")
+
+    client = _paramiko.SSHClient()
+    client.set_missing_host_key_policy(_paramiko.AutoAddPolicy())
+    try:
+        client.connect(host, username=user, password=pw, timeout=15)
+        client.exec_command("mkdir -p ~/.ssh && chmod 700 ~/.ssh")[1].read()
+        client.exec_command(
+            f"grep -qF '{pub_key}' ~/.ssh/authorized_keys 2>/dev/null || "
+            f"echo '{pub_key}' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+        )[1].read()
+        client.close()
+        return f"✅  Schluessel installiert auf {user}@{host}:~/.ssh/authorized_keys"
+    except Exception as e:
+        return f"❌  Fehler: {e}"
+
+
 # ── SCP via paramiko ───────────────────────────────────────────────────────────
 
 def scp_upload(local_datei: Path, remote_pfad: str) -> str:
@@ -2829,6 +3023,30 @@ def spielschleife(spiel: Spiel):
                 zeige_dialog = True
             else:
                 nachricht = out_nano
+            spiel.speichern()
+            continue
+
+        # ── ssh-keygen: Schluesselpaar erstellen (lokal) ───────────────────────
+        if basis_cmd == "ssh-keygen":
+            rc, out, err = fuehre_aus(cmd, spiel.aktuell)
+            ausgabe = out or err or "Schluessel erstellt!"
+            q_erg = pruefe_quest(spiel, cmd, ausgabe)
+            nachricht = q_erg if q_erg else ausgabe[:300]
+            if q_erg:
+                zeige_dialog = True
+            spiel.terminal.append((cmd, ausgabe[:150]))
+            spiel.speichern()
+            continue
+
+        # ── ssh-copy-id: Key per paramiko auf VPS installieren ─────────────────
+        if basis_cmd == "ssh-copy-id":
+            print(c("Installiere SSH-Schluessel auf dem Server ...", F.CYAN))
+            ergebnis = install_ssh_key()
+            q_erg = pruefe_quest(spiel, cmd, ergebnis)
+            nachricht = q_erg if q_erg else ergebnis
+            if q_erg:
+                zeige_dialog = True
+            spiel.terminal.append((cmd, ergebnis[:150]))
             spiel.speichern()
             continue
 
