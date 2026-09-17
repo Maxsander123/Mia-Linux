@@ -3155,6 +3155,9 @@ def scp_upload(local_datei: Path, remote_pfad: str) -> str:
         sftp = client.open_sftp()
         # Zielpfad aufloesen
         ziel = remote_pfad.replace("~", f"/home/{user}")
+        # Wenn Ziel ein Verzeichnis (endet mit /), Dateiname anhaengen
+        if ziel.endswith("/"):
+            ziel += local_datei.name
         # Zielordner anlegen falls noetig
         ziel_dir = ziel.rsplit("/", 1)[0] if "/" in ziel else f"/home/{user}"
         client.exec_command(f"mkdir -p {ziel_dir}")[1].read()
@@ -3544,6 +3547,37 @@ def spielschleife(spiel: Spiel):
             spiel.speichern()
             continue
 
+        # ── Shell-Skripte mit scp-Befehlen abfangen ────────────────────────────
+        if basis_cmd.startswith("./") and basis_cmd.endswith(".sh") and spiel.raum_id() in {"fernwelt", "deploymeisterei", "webwerkstatt"}:
+            skript_name = basis_cmd[2:]
+            skript_pfad = spiel.aktuell / skript_name
+            if skript_pfad.exists():
+                skript_inhalt = skript_pfad.read_text()
+                ausgabe_zeilen = []
+                for zeile in skript_inhalt.splitlines():
+                    z = zeile.strip()
+                    if not z or z.startswith("#!"):
+                        continue
+                    if z.startswith("scp ") and (VPS_CONFIG.get("host", "") in z or "152.53." in z):
+                        # scp-Zeile via paramiko simulieren
+                        zsh = z.split()
+                        if len(zsh) >= 3:
+                            lok = spiel.aktuell / zsh[1]
+                            ziel_pfad = zsh[-1].split(":", 1)[-1] if ":" in zsh[-1] else "~/website/"
+                            ausgabe_zeilen.append(scp_upload(lok, ziel_pfad))
+                    elif z.startswith("echo "):
+                        _, sh_out, _ = fuehre_aus(z, spiel.aktuell)
+                        if sh_out:
+                            ausgabe_zeilen.append(sh_out)
+                ergebnis = "\n".join(ausgabe_zeilen) if ausgabe_zeilen else f"✅  {skript_name} ausgefuehrt"
+                q_erg = pruefe_quest(spiel, cmd, ergebnis)
+                nachricht = q_erg if q_erg else ergebnis
+                if q_erg:
+                    zeige_dialog = True
+                spiel.terminal.append((cmd, ergebnis[:150]))
+                spiel.speichern()
+                continue
+
         # ── scp: Datei auf VPS uebertragen ─────────────────────────────────────
         if basis_cmd == "scp":
             # Einfache Verarbeitung: scp LOKALDATEI user@host:ZIELPFAD
@@ -3590,6 +3624,26 @@ def spielschleife(spiel: Spiel):
 
         rc, out, err = fuehre_aus(cmd, spiel.aktuell)
         ausgabe = out or err or ''
+
+        # Curl in VPS-Raum: Server nicht erreichbar → automatisch starten und nochmal versuchen
+        VPS_RAEUME_SET = {"fernwelt", "webwerkstatt", "deploymeisterei"}
+        if basis_cmd == "curl" and spiel.raum_id() in VPS_RAEUME_SET and rc != 0 and PARAMIKO_OK and VPS_CONFIG:
+            vps_host = VPS_CONFIG.get("host", "")
+            if vps_host and vps_host in cmd:
+                try:
+                    _c2 = _paramiko.SSHClient()
+                    _c2.set_missing_host_key_policy(_paramiko.AutoAddPolicy())
+                    _c2.connect(vps_host, username=VPS_CONFIG.get("user",""), password=VPS_CONFIG.get("password",""), timeout=10)
+                    _c2.exec_command("cd ~/website && nohup python3 -m http.server 8080 > ~/webserver.log 2>&1 &")[1].read()
+                    _c2.close()
+                    import time as _t; _t.sleep(1)
+                    rc, out, err = fuehre_aus(cmd, spiel.aktuell)
+                    ausgabe = out or err or ''
+                    if out:
+                        ausgabe = "🌐 Server gestartet! " + out
+                except Exception:
+                    pass  # Fehler ignorieren, curl-Ausgabe bleibt
+
         spiel.terminal.append((cmd, ausgabe[:150]))
 
         q_erg = pruefe_quest(spiel, cmd, out)
