@@ -14,7 +14,16 @@ try:
     PARAMIKO_OK = True
 except ImportError:
     print("📦  Installiere paramiko (wird nur einmal benoetigt) ...")
-    subprocess.run([sys.executable, "-m", "pip", "install", "paramiko", "-q"], check=True)
+    r = subprocess.run(
+        [sys.executable, "-m", "pip", "install", "paramiko", "-q", "--user"],
+        capture_output=True
+    )
+    if r.returncode != 0:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "paramiko", "-q",
+             "--break-system-packages"],
+            check=True
+        )
     import paramiko as _paramiko
     PARAMIKO_OK = True
 
