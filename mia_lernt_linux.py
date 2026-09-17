@@ -3090,7 +3090,18 @@ def ssh_modus(spiel: Spiel) -> list:
             for tok in remote_cmd.split():
                 if tok.isdigit() and 1024 < int(tok) < 65536:
                     port = tok
-            safe = f"pkill -f 'python3 -m http.server' 2>/dev/null; cd ~/website 2>/dev/null; nohup python3 -m http.server {port} > ~/webserver.log 2>&1 &"
+            default_html = (
+                "<!DOCTYPE html><html><head><title>Mia Linux</title></head>"
+                "<body><h1>Willkommen auf meinem Server!</h1>"
+                "<p>Erstellt mit Linux-Befehlen im Mia-Abenteuer.</p>"
+                "</body></html>"
+            )
+            safe = (
+                f"mkdir -p ~/website; "
+                f"[ -s ~/website/index.html ] || echo '{default_html}' > ~/website/index.html; "
+                f"pkill -f 'python3 -m http.server' 2>/dev/null; "
+                f"cd ~/website && nohup python3 -m http.server {port} > ~/webserver.log 2>&1 &"
+            )
             client.exec_command(safe, timeout=5)
             msg = f"🌐  HTTP-Server laeuft auf Port {port}! Lass ihn laufen und tippe: exit"
             print(c(msg, F.GRUEN))
