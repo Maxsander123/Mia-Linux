@@ -3164,6 +3164,39 @@ def scp_upload(local_datei: Path, remote_pfad: str) -> str:
         return f"❌  SCP-Fehler: {e}"
 
 
+# ── VPS Vorbereitung (laeuft beim Start im Hintergrund) ───────────────────────
+
+def vps_vorbereiten():
+    """Bereinigt und bereitet den VPS fuer das Spiel vor. Laeuft in einem Thread."""
+    if not PARAMIKO_OK or not VPS_CONFIG:
+        return
+    host = VPS_CONFIG.get("host", "")
+    user = VPS_CONFIG.get("user", "")
+    pw   = VPS_CONFIG.get("password", "")
+    try:
+        client = _paramiko.SSHClient()
+        client.set_missing_host_key_policy(_paramiko.AutoAddPolicy())
+        client.connect(host, username=user, password=pw, timeout=15)
+
+        befehle = [
+            # Webserver stoppen falls einer laeuft
+            "pkill -f 'python3 -m http.server' 2>/dev/null; true",
+            # Website-Ordner sauber aufsetzen
+            "rm -rf ~/website && mkdir -p ~/website",
+            # Alte Crontab-Eintraege entfernen
+            "crontab -r 2>/dev/null; true",
+            # Zeitlog loeschen
+            "rm -f ~/zeitlog.txt",
+        ]
+        for b in befehle:
+            _, stdout, stderr = client.exec_command(b, timeout=10)
+            stdout.read(); stderr.read()
+
+        client.close()
+    except Exception:
+        pass  # Stiller Fehler – VPS nicht erreichbar ist kein Show-Stopper
+
+
 # ── Hauptspielschleife ─────────────────────────────────────────────────────────
 
 def spielschleife(spiel: Spiel):
@@ -3690,6 +3723,15 @@ def main():
 
     basis = Path.home() / "linux_abenteuer"
     welt_aufbauen(basis)
+
+    # VPS im Hintergrund vorbereiten (bereinigt + richtet ein)
+    if PARAMIKO_OK and VPS_CONFIG:
+        import threading
+        print(c("  🌐  Verbinde mit VPS und bereite Server vor ...", F.GRAU))
+        _t = threading.Thread(target=vps_vorbereiten, daemon=True)
+        _t.start()
+        _t.join(timeout=20)  # max 20s warten, dann weitermachen
+        print(c("  ✅  Server bereit!\n", F.GRUEN))
 
     name  = startbildschirm()
     spiel = Spiel(basis, name)
