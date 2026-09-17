@@ -3658,9 +3658,19 @@ def spielschleife(spiel: Spiel):
                     _c2 = _paramiko.SSHClient()
                     _c2.set_missing_host_key_policy(_paramiko.AutoAddPolicy())
                     _c2.connect(vps_host, username=VPS_CONFIG.get("user",""), password=VPS_CONFIG.get("password",""), timeout=10)
-                    _c2.exec_command("cd ~/website && nohup python3 -m http.server 8080 > ~/webserver.log 2>&1 &")[1].read()
+                    default_html = (
+                        "<!DOCTYPE html><html><head><title>Mia Linux</title></head>"
+                        "<body><h1>Willkommen auf meinem Server!</h1>"
+                        "<p>Erstellt mit Linux-Befehlen im Mia-Abenteuer.</p>"
+                        "</body></html>"
+                    )
+                    _c2.exec_command(
+                        f"mkdir -p ~/website; "
+                        f"[ -s ~/website/index.html ] || echo '{default_html}' > ~/website/index.html; "
+                        f"cd ~/website && nohup python3 -m http.server 8080 > ~/webserver.log 2>&1 &"
+                    )[1].read()
                     _c2.close()
-                    import time as _t; _t.sleep(1)
+                    import time as _t; _t.sleep(3)
                     rc, out, err = fuehre_aus(cmd, spiel.aktuell)
                     ausgabe = out or err or ''
                     if out:
