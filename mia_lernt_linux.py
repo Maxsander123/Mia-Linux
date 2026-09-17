@@ -3255,9 +3255,12 @@ def spielschleife(spiel: Spiel):
             spiel.speichern()
             continue
 
-        # ── ssh-keygen: Schluesselpaar erstellen (lokal) ───────────────────────
+        # ── ssh-keygen: Schluesselpaar erstellen (lokal, non-interaktiv) ─────────
         if basis_cmd == "ssh-keygen":
-            rc, out, err = fuehre_aus(cmd, spiel.aktuell)
+            # Erzwinge non-interaktiv: -f Pfad, -N '' (kein Passwort)
+            key_path = str(Path.home() / ".ssh" / "id_ed25519")
+            ni_cmd = f"ssh-keygen -t ed25519 -f {key_path} -N ''"
+            rc, out, err = fuehre_aus(ni_cmd, spiel.aktuell)
             ausgabe = out or err or "Schluessel erstellt!"
             q_erg = pruefe_quest(spiel, cmd, ausgabe)
             nachricht = q_erg if q_erg else ausgabe[:300]
@@ -3297,11 +3300,14 @@ def spielschleife(spiel: Spiel):
             # Starte SSH-Mini-Shell
             verlauf = ssh_modus(spiel)
             # Quest-Checks fuer alle Remote-Befehle
+            # in_ssh muss True sein waehrend der Checks (ssh_modus setzt es auf False)
+            spiel.in_ssh = True
             for r_cmd, r_out in verlauf:
                 rq = pruefe_quest(spiel, r_cmd, r_out)
                 if rq and not zeige_dialog:
                     nachricht = rq
                     zeige_dialog = True
+            spiel.in_ssh = False
             spiel.terminal.append((cmd, f"SSH-Session: {len(verlauf)} Befehle"))
             spiel.speichern()
             continue
