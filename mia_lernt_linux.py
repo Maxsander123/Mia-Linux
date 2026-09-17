@@ -3498,7 +3498,7 @@ def spielschleife(spiel: Spiel):
 
         # ── Alle anderen Befehle: wirklich ausführen ───────────────────────────
         VPS_RAEUME = {"fernwelt", "schluesselschmiede", "zeituhr", "webwerkstatt", "deploymeisterei"}
-        if spiel.ort in VPS_RAEUME and basis_cmd in ("ls", "mkdir", "cd", "cat", "rm", "touch", "pwd", "crontab", "echo", "sed"):
+        if spiel.raum_id() in VPS_RAEUME and basis_cmd in ("ls", "mkdir", "cd", "cat", "rm", "touch", "pwd", "crontab", "echo", "sed"):
             aktive_q = _aktive_quest(spiel)
             q_modus  = aktive_q.get("modus", "") if aktive_q else ""
             vps_user = VPS_CONFIG.get('user', 'mia')
