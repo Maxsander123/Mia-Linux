@@ -1995,74 +1995,100 @@ RAEUME = {
         "emoji":       "🌐",
         "beschreibung": (
             "Ein schimmerndes Portal oeffnet sich vor dir – ein Tor zu einem echten\n"
-            "Server irgendwo in der Ferne. Knotenpunkt-Waerchterin Vera erklaert dir,\n"
-            "wie man sich per SSH einloggt, Dateien uebertraegt und einen Webserver startet.\n"
-            "Das ist keine Simulation – du verbindest dich mit einem ECHTEN Linux-Server!"
+            "Linux-Server weit entfernt. SSH (Secure Shell) ist dein Schluesselbegriff:\n"
+            "Du tippst einen Befehl und landest in einer Shell auf einem anderen Rechner!\n\n"
+            "So funktioniert es:\n"
+            "  1. Tippe:  ssh mia@152.53.225.236   → SSH-Modus startet\n"
+            "  2. Du siehst:  mia@server:~$        → du bist JETZT auf dem Server!\n"
+            "  3. Tippe Befehle wie gewohnt (ls, mkdir, cd ...)\n"
+            "  4. Tippe:  exit                     → zurueck ins Koenigreich\n\n"
+            "Tipp: Tippe  sshhilfe  fuer eine Uebersicht!"
         ),
         "ausgaenge": {"hafen": "Hafen", "schluesselschmiede": "Schlüsselschmiede", "zeituhr": "Zeituhr", "webwerkstatt": "Webwerkstatt"},
         "npc": {
             "name": "Vera",
             "bild": "🌐",
             "dialoge": [
-                "Willkommen am Fernwelt-Portal! Ich bin Vera, Waerchterin der Verbindungen.\n"
-                "SSH ist der Schluesselbegriff fuer Fernzugriff: Secure Shell.\n"
-                "Tippe: ssh mia@152.53.225.236  – und du bist auf einem echten Server!",
-                "Gut gemacht! Jetzt lerne deinen neuen Server kennen.\n"
-                "Tippe im SSH-Modus: ls  – zeig mir was dort liegt.\n"
-                "Dann: mkdir website  – erstelle deinen Web-Ordner!\n"
-                "Mit 'exit' kehrst du ins Koenigreich zurueck.",
-                "Jetzt kommt SCP – Secure Copy! Erstelle zuerst eine HTML-Datei:\n"
-                "echo '<h1>Hallo Welt!</h1>' > index.html\n"
-                "Dann sende sie auf den Server:\n"
-                "scp index.html mia@152.53.225.236:~/website/",
-                "Fantastisch! Jetzt starte den Webserver:\n"
-                "ssh mia@152.53.225.236  – verbinde dich nochmal.\n"
-                "Dann: cd website && python3 -m http.server 8080 &\n"
-                "Dann 'exit' und teste mit: curl http://152.53.225.236:8080",
-                "Du hast es! Du kennst jetzt SSH, SCP und Webserver!\n"
-                "Das ist das Herzstueck von Linux-Server-Administration.\n"
-                "Jeder DevOps-Engineer, jeder Admin – alle benutzen genau das!",
+                "Willkommen am Fernwelt-Portal! Ich bin Vera, Waerchterin der Verbindungen.\n\n"
+                "SSH bedeutet: Secure Shell – eine verschluesselte Verbindung zu einem\n"
+                "anderen Linux-Rechner. So verbindest du dich:\n\n"
+                "  Schritt 1: Tippe  ssh mia@152.53.225.236\n"
+                "  Schritt 2: Du siehst  mia@152.53.225.236:~$  – du bist drin!\n"
+                "  Schritt 3: Tippe Befehle auf dem Server (ls, mkdir, ...)\n"
+                "  Schritt 4: Tippe  exit  um zurueckzukehren\n\n"
+                "Probier es aus! Tippe: sshhilfe  fuer mehr Tipps.",
+                "Super! Im SSH-Modus (wenn du  mia@server:~$  siehst) kannst du:\n\n"
+                "  ls           – Dateien auf dem Server anzeigen\n"
+                "  mkdir website  – Ordner erstellen\n"
+                "  pwd          – aktuellen Pfad anzeigen\n"
+                "  exit         – zurueck ins Spiel\n\n"
+                "Merke: Alles was du dort tippst, laeuft auf dem echten Server!",
+                "Jetzt lernst du SCP – Secure Copy. Dateien senden:\n\n"
+                "  Schritt 1: Erstelle lokal eine HTML-Datei (du bist NICHT im SSH-Modus):\n"
+                "    echo '<h1>Hallo Welt!</h1>' > index.html\n\n"
+                "  Schritt 2: Sende sie auf den Server:\n"
+                "    scp index.html mia@152.53.225.236:~/website/\n\n"
+                "SCP-Format: scp LOKALE-DATEI user@server:ZIELPFAD",
+                "Fast geschafft! Starte jetzt den Webserver:\n\n"
+                "  Schritt 1: Verbinde dich nochmal:  ssh mia@152.53.225.236\n"
+                "  Schritt 2: Wechsle in den Ordner:  cd website\n"
+                "  Schritt 3: Starte Server:           python3 -m http.server 8080 &\n"
+                "  Schritt 4: Tippe  exit  und dann:\n"
+                "             curl http://152.53.225.236:8080\n\n"
+                "Das & am Ende laesst den Server im Hintergrund laufen!",
+                "Hervorragend! SSH, SCP, Webserver – das ist echte Server-Arbeit!\n"
+                "Jeder DevOps-Engineer, jeder Admin, jeder Webentwickler\n"
+                "benutzt genau diese Werkzeuge taeglich.\n"
+                "Erkunde jetzt die Schluesselschmiede und die Zeituhr!",
             ],
         },
         "quests": [
             {
                 "id":       "ssh_connect",
-                "ziel":     "Verbinde dich per SSH: ssh mia@152.53.225.236",
+                "ziel":     "Verbinde dich mit dem Server – tippe: ssh mia@152.53.225.236\n"
+                            "         → Du siehst dann: mia@152.53.225.236:~$ (SSH-Modus!)",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ssh" and "152.53.225.236" in cmd,
                 "belohnung":"🌐 Schriftrolle der Fernverbindung",
-                "lernziel": "SSH = Secure Shell. Sicheres Einloggen auf Remote-Server. Standard in der Linux-Welt!",
+                "lernziel": "SSH = Secure Shell. Einloggen auf Remote-Server. Standard in der Linux-Welt!",
             },
             {
                 "id":       "remote_ls",
-                "ziel":     "Schau dich auf dem Server um (im SSH-Modus tippe): ls",
+                "ziel":     "Du bist im SSH-Modus (mia@server:~$ sichtbar).\n"
+                            "         Tippe dort: ls   → zeigt Dateien auf dem Server",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ls" and getattr(p, "in_ssh", False),
                 "belohnung":"🌐 Schriftrolle des Fernblicks",
-                "lernziel": "ls funktioniert auf jedem Linux-Server gleich. Du kennst es schon – jetzt remote!",
+                "lernziel": "ls funktioniert auf jedem Linux-Server gleich. Jetzt laeuft es remote!",
             },
             {
                 "id":       "remote_mkdir",
-                "ziel":     "Erstelle den Website-Ordner (SSH-Modus): mkdir website",
+                "ziel":     "Noch im SSH-Modus (mia@server:~$ sichtbar).\n"
+                            "         Tippe: mkdir website   → erstellt Ordner auf dem Server",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "mkdir" and getattr(p, "in_ssh", False),
                 "belohnung":"🌐 Schriftrolle des Fernordners",
                 "lernziel": "mkdir auf einem Remote-Server – dein erster eigener Webspace-Ordner!",
             },
             {
                 "id":       "create_html",
-                "ziel":     "Erstelle eine HTML-Datei lokal: echo '<h1>Hallo Welt!</h1>' > index.html",
+                "ziel":     "Tippe exit um die SSH-Session zu beenden.\n"
+                            "         Erstelle dann LOKAL eine HTML-Datei:\n"
+                            "         echo '<h1>Hallo Welt!</h1>' > index.html",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "echo" and ".html" in cmd and ">" in cmd,
                 "belohnung":"🌐 Schriftrolle des Webs",
                 "lernziel": "HTML = HyperText Markup Language. Die Sprache des Webs! Jede Website beginnt mit <h1>.",
             },
             {
                 "id":       "scp_upload",
-                "ziel":     "Lade die HTML-Datei auf den Server: scp index.html mia@152.53.225.236:~/website/",
+                "ziel":     "Lade die Datei auf den Server (LOKAL tippen, KEIN SSH-Modus):\n"
+                            "         scp index.html mia@152.53.225.236:~/website/",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "scp" and "152.53.225.236" in cmd and ".html" in cmd,
                 "belohnung":"🌐 Schriftrolle des Transports",
-                "lernziel": "SCP = Secure Copy. Wie cp, aber ueber SSH auf einen anderen Server. scp QUELLE ZIEL.",
+                "lernziel": "SCP = Secure Copy. Wie cp, aber ueber SSH. Format: scp QUELLE user@host:ZIEL",
             },
             {
                 "id":       "start_server",
-                "ziel":     "Starte den Webserver (SSH-Modus): cd website && python3 -m http.server 8080 &",
+                "ziel":     "Verbinde dich nochmal: ssh mia@152.53.225.236\n"
+                            "         Dann im SSH-Modus: cd website && python3 -m http.server 8080 &\n"
+                            "         Dann exit tippen.",
                 "check":    lambda cmd, out, p: "http.server" in cmd and "8080" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"🌐 Schriftrolle des Servers",
                 "lernziel": "python3 -m http.server PORT startet sofort einen Webserver. & = laeuft im Hintergrund.",
@@ -2998,7 +3024,11 @@ def ssh_modus(spiel: Spiel) -> list:
         print(c('╚' + '═' * (W - 2) + '╝', F.CYAN))
         return []
 
-    print(c(f"║  ✅ Verbunden! Tippe Befehle. 'exit' kehrt ins Spiel zurueck.".ljust(W - 1) + "║", F.GRUEN))
+    print(c(f"║  ✅ Verbunden!".ljust(W - 1) + "║", F.GRUEN))
+    print(c('╠' + '═' * (W - 2) + '╣', F.CYAN))
+    print(c(f"║  Du bist jetzt auf dem Server! Alles was du tippst laeuft DORT.".ljust(W - 1) + "║", F.GELB))
+    print(c(f"║  Nuetzliche Befehle: ls · pwd · mkdir · cd · cat · nano".ljust(W - 1) + "║", F.GRAU))
+    print(c(f"║  Zum Beenden tippe:  exit   (kehrt ins Koenigreich zurueck)".ljust(W - 1) + "║", F.GRAU))
     print(c('╚' + '═' * (W - 2) + '╝', F.CYAN))
     print()
 
@@ -3157,7 +3187,36 @@ def spielschleife(spiel: Spiel):
                 "  inventar / status – Fortschritt anzeigen\n"
                 "  konzept – Dateisystem-Erklaerung\n"
                 "  spickzettel – Linux-Spickzettel\n"
-                "  beenden – Spiel beenden (Fortschritt gespeichert)"
+                "  beenden – Spiel beenden (Fortschritt gespeichert)\n"
+                "  sshhilfe – SSH-Anleitung anzeigen"
+            )
+            spiel.terminal.append((cmd, ''))
+            continue
+
+        if basis_cmd == "sshhilfe":
+            host_anzeige = VPS_CONFIG.get('host', 'SERVER_IP')
+            user_anzeige = VPS_CONFIG.get('user', 'mia')
+            nachricht = (
+                "╔══ SSH-ANLEITUNG ══════════════════════════════╗\n"
+                "║                                               ║\n"
+                f"║  1. Verbinden:                                ║\n"
+                f"║     ssh {user_anzeige}@{host_anzeige}         ║\n"
+                "║     → Du siehst: mia@server:~$  (SSH-Modus!) ║\n"
+                "║                                               ║\n"
+                "║  2. Im SSH-Modus (auf dem Server):            ║\n"
+                "║     ls          Dateien anzeigen              ║\n"
+                "║     pwd         Aktuellen Pfad                ║\n"
+                "║     mkdir name  Ordner erstellen              ║\n"
+                "║     cd ordner   In Ordner wechseln            ║\n"
+                "║     cat datei   Datei lesen                   ║\n"
+                "║     exit        Verbindung trennen            ║\n"
+                "║                                               ║\n"
+                "║  3. Datei uebertragen (LOKAL, kein SSH):      ║\n"
+                f"║     scp datei.html {user_anzeige}@{host_anzeige}:~/website/ ║\n"
+                "║                                               ║\n"
+                "║  WICHTIG: ls/mkdir etc. im SSH-Modus          ║\n"
+                "║  laufen auf dem SERVER, nicht lokal!          ║\n"
+                "╚═══════════════════════════════════════════════╝"
             )
             spiel.terminal.append((cmd, ''))
             continue
