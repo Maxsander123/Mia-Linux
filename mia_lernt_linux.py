@@ -2045,50 +2045,48 @@ RAEUME = {
         "quests": [
             {
                 "id":       "ssh_connect",
-                "ziel":     "Verbinde dich mit dem Server – tippe: ssh mia@152.53.225.236\n"
-                            "         → Du siehst dann: mia@152.53.225.236:~$ (SSH-Modus!)",
+                "modus":    "lokal",
+                "ziel":     "ssh mia@152.53.225.236",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ssh" and "152.53.225.236" in cmd,
                 "belohnung":"🌐 Schriftrolle der Fernverbindung",
                 "lernziel": "SSH = Secure Shell. Einloggen auf Remote-Server. Standard in der Linux-Welt!",
             },
             {
                 "id":       "remote_ls",
-                "ziel":     "Du bist im SSH-Modus (mia@server:~$ sichtbar).\n"
-                            "         Tippe dort: ls   → zeigt Dateien auf dem Server",
+                "modus":    "ssh",
+                "ziel":     "ls",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ls" and getattr(p, "in_ssh", False),
                 "belohnung":"🌐 Schriftrolle des Fernblicks",
                 "lernziel": "ls funktioniert auf jedem Linux-Server gleich. Jetzt laeuft es remote!",
             },
             {
                 "id":       "remote_mkdir",
-                "ziel":     "Noch im SSH-Modus (mia@server:~$ sichtbar).\n"
-                            "         Tippe: mkdir website   → erstellt Ordner auf dem Server",
+                "modus":    "ssh",
+                "ziel":     "mkdir website",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "mkdir" and getattr(p, "in_ssh", False),
                 "belohnung":"🌐 Schriftrolle des Fernordners",
                 "lernziel": "mkdir auf einem Remote-Server – dein erster eigener Webspace-Ordner!",
             },
             {
                 "id":       "create_html",
-                "ziel":     "Tippe exit um die SSH-Session zu beenden.\n"
-                            "         Erstelle dann LOKAL eine HTML-Datei:\n"
-                            "         echo '<h1>Hallo Welt!</h1>' > index.html",
+                "modus":    "lokal",
+                "ziel":     "echo '<h1>Hallo Welt!</h1>' > index.html",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "echo" and ".html" in cmd and ">" in cmd,
                 "belohnung":"🌐 Schriftrolle des Webs",
                 "lernziel": "HTML = HyperText Markup Language. Die Sprache des Webs! Jede Website beginnt mit <h1>.",
             },
             {
                 "id":       "scp_upload",
-                "ziel":     "Lade die Datei auf den Server (LOKAL tippen, KEIN SSH-Modus):\n"
-                            "         scp index.html mia@152.53.225.236:~/website/",
+                "modus":    "lokal",
+                "ziel":     "scp index.html mia@152.53.225.236:~/website/",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "scp" and "152.53.225.236" in cmd and ".html" in cmd,
                 "belohnung":"🌐 Schriftrolle des Transports",
                 "lernziel": "SCP = Secure Copy. Wie cp, aber ueber SSH. Format: scp QUELLE user@host:ZIEL",
             },
             {
                 "id":       "start_server",
-                "ziel":     "Verbinde dich nochmal: ssh mia@152.53.225.236\n"
-                            "         Dann im SSH-Modus: cd website && python3 -m http.server 8080 &\n"
-                            "         Dann exit tippen.",
+                "modus":    "ssh",
+                "ziel":     "cd website && python3 -m http.server 8080 &",
                 "check":    lambda cmd, out, p: "http.server" in cmd and "8080" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"🌐 Schriftrolle des Servers",
                 "lernziel": "python3 -m http.server PORT startet sofort einen Webserver. & = laeuft im Hintergrund.",
@@ -2138,35 +2136,40 @@ RAEUME = {
         "quests": [
             {
                 "id":       "keygen",
-                "ziel":     "Erstelle ein SSH-Schluesselpaar: ssh-keygen -t ed25519",
+                "modus":    "lokal",
+                "ziel":     "ssh-keygen -t ed25519",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ssh-keygen" and "ed25519" in cmd,
                 "belohnung":"🔑 Schriftrolle des Schluessels",
                 "lernziel": "ssh-keygen erstellt privaten + oeffentlichen Schluessel. -t ed25519 = moderner Algorithmus.",
             },
             {
                 "id":       "cat_pubkey",
-                "ziel":     "Zeige den oeffentlichen Schluessel: cat ~/.ssh/id_ed25519.pub",
+                "modus":    "lokal",
+                "ziel":     "cat ~/.ssh/id_ed25519.pub",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "cat" and "id_ed25519.pub" in cmd,
                 "belohnung":"🔑 Schriftrolle des Oeffentlichen",
                 "lernziel": "Der oeffentliche Schluessel (.pub) darf auf Server kopiert werden. Der private bleibt geheim!",
             },
             {
                 "id":       "ssh_copy_id",
-                "ziel":     "Kopiere deinen Schluessel auf den Server: ssh-copy-id mia@152.53.225.236",
+                "modus":    "lokal",
+                "ziel":     "ssh-copy-id mia@152.53.225.236",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ssh-copy-id" and "152.53.225.236" in cmd,
                 "belohnung":"🔑 Schriftrolle der Installation",
                 "lernziel": "ssh-copy-id schreibt deinen Schluessel in ~/.ssh/authorized_keys auf dem Server.",
             },
             {
                 "id":       "ssh_nopasswd",
-                "ziel":     "Logge dich ohne Passwort ein: ssh mia@152.53.225.236",
+                "modus":    "lokal",
+                "ziel":     "ssh mia@152.53.225.236",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ssh" and "152.53.225.236" in cmd,
                 "belohnung":"🔑 Schriftrolle der Freiheit",
                 "lernziel": "Public-Key-Auth: Server prueft ob dein privater Schluessel zum installierten passt. Kein Passwort!",
             },
             {
                 "id":       "ls_ssh_dir",
-                "ziel":     "Sieh deine gespeicherten Schluessel: ls -la ~/.ssh/",
+                "modus":    "lokal",
+                "ziel":     "ls -la ~/.ssh/",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "ls" and ".ssh" in cmd,
                 "belohnung":"🔑 Schriftrolle des Gewölbes",
                 "lernziel": "~/.ssh/ enthaelt: id_ed25519 (privat!), id_ed25519.pub, known_hosts, authorized_keys.",
@@ -2209,35 +2212,40 @@ RAEUME = {
         "quests": [
             {
                 "id":       "crontab_list",
-                "ziel":     "Zeige geplante Jobs (SSH-Modus): crontab -l",
+                "modus":    "ssh",
+                "ziel":     "crontab -l",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "crontab" and "-l" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"⏰ Schriftrolle der Zeit",
                 "lernziel": "crontab -l = list. Zeigt alle geplanten automatischen Aufgaben des aktuellen Benutzers.",
             },
             {
                 "id":       "crontab_add",
-                "ziel":     "Plane einen Job: echo '* * * * * date >> ~/zeitlog.txt' | crontab -",
+                "modus":    "ssh",
+                "ziel":     "echo '* * * * * date >> ~/zeitlog.txt' | crontab -",
                 "check":    lambda cmd, out, p: "crontab" in cmd and "|" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"⏰ Schriftrolle der Planung",
                 "lernziel": "Format: MIN STD TAG MON WTAG BEFEHL. * = jeder Wert. | crontab - = direkt setzen ohne Editor.",
             },
             {
                 "id":       "crontab_verify",
-                "ziel":     "Pruefe den neuen Eintrag: crontab -l",
+                "modus":    "ssh",
+                "ziel":     "crontab -l",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "crontab" and "-l" in cmd and getattr(p, "in_ssh", False) and "crontab_add" in p.abschluss,
                 "belohnung":"⏰ Schriftrolle der Bestaetigung",
                 "lernziel": "Immer nach Aenderungen crontab -l zur Kontrolle! Syntaxfehler verhindern die Ausfuehrung.",
             },
             {
                 "id":       "crontab_log",
-                "ziel":     "Lies das automatische Log: cat ~/zeitlog.txt",
+                "modus":    "ssh",
+                "ziel":     "cat ~/zeitlog.txt",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "cat" and "zeitlog" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"⏰ Schriftrolle des Beweises",
                 "lernziel": ">> leitet Ausgabe an eine Datei an. So sammeln Cronjobs ihre Ergebnisse in Log-Dateien.",
             },
             {
                 "id":       "crontab_remove",
-                "ziel":     "Raeume auf und entferne alle Jobs: crontab -r",
+                "modus":    "ssh",
+                "ziel":     "crontab -r",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "crontab" and "-r" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"⏰ Schriftrolle der Ordnung",
                 "lernziel": "crontab -r entfernt ALLE Jobs! crontab -e oeffnet den Editor zum gezielten Bearbeiten.",
@@ -2291,70 +2299,80 @@ RAEUME = {
         "quests": [
             {
                 "id":       "html_doctype",
-                "ziel":     "Starte die HTML-Datei (SSH): echo '<!DOCTYPE html>' > ~/website/index.html",
+                "modus":    "ssh",
+                "ziel":     "echo '<!DOCTYPE html>' > ~/website/index.html",
                 "check":    lambda cmd, out, p: "DOCTYPE" in cmd and "index.html" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"💻 Schriftrolle des Dokumenttyps",
                 "lernziel": "<!DOCTYPE html> sagt dem Browser: das ist HTML5. Muss die ERSTE Zeile jeder HTML-Datei sein.",
             },
             {
                 "id":       "html_frame",
-                "ziel":     "Fuege den HTML-Rahmen ein (SSH): echo '<html><head><title>Mia Linux</title></head><body>' >> ~/website/index.html",
+                "modus":    "ssh",
+                "ziel":     "echo '<html><head><title>Mia Linux</title></head><body>' >> ~/website/index.html",
                 "check":    lambda cmd, out, p: "<html>" in cmd and "<title>" in cmd and ">>" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"💻 Schriftrolle der Struktur",
                 "lernziel": "html umschliesst alles. head = unsichtbare Infos (Titel, CSS). body = sichtbarer Inhalt.",
             },
             {
                 "id":       "html_h1",
-                "ziel":     "Fuege eine Ueberschrift ein (SSH): echo '<h1>Willkommen!</h1>' >> ~/website/index.html",
+                "modus":    "ssh",
+                "ziel":     "echo '<h1>Willkommen!</h1>' >> ~/website/index.html",
                 "check":    lambda cmd, out, p: "<h1>" in cmd and ">>" in cmd and "index.html" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"💻 Schriftrolle der Ueberschrift",
                 "lernziel": "h1 = groesste Ueberschrift. h2-h6 werden kleiner. Jede Seite sollte genau ein h1 haben.",
             },
             {
                 "id":       "html_paragraph",
-                "ziel":     "Fuege einen Absatz ein (SSH): echo '<p>Gelernte Befehle:</p>' >> ~/website/index.html",
+                "modus":    "ssh",
+                "ziel":     "echo '<p>Gelernte Befehle:</p>' >> ~/website/index.html",
                 "check":    lambda cmd, out, p: "<p>" in cmd and ">>" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"💻 Schriftrolle des Absatzes",
                 "lernziel": "p = paragraph = Absatz. Block-Element mit Abstand oben und unten.",
             },
             {
                 "id":       "html_list",
-                "ziel":     "Fuege eine Liste ein (SSH): echo '<ul><li>SSH</li><li>SCP</li></ul>' >> ~/website/index.html",
+                "modus":    "ssh",
+                "ziel":     "echo '<ul><li>SSH</li><li>SCP</li></ul>' >> ~/website/index.html",
                 "check":    lambda cmd, out, p: "<ul>" in cmd and "<li>" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"💻 Schriftrolle der Liste",
                 "lernziel": "ul = unordered list (Punkte). ol = ordered list (Zahlen). li = list item.",
             },
             {
                 "id":       "html_link",
-                "ziel":     "Fuege einen Link ein (SSH): echo '<a href=\"about.html\">Ueber mich</a>' >> ~/website/index.html",
+                "modus":    "ssh",
+                "ziel":     "echo '<a href=\"about.html\">Ueber mich</a>' >> ~/website/index.html",
                 "check":    lambda cmd, out, p: "<a " in cmd and "href" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"💻 Schriftrolle der Verbindung",
                 "lernziel": "a = anchor = Link. href = hypertext reference. Das Grundprinzip des Internets!",
             },
             {
                 "id":       "html_close",
-                "ziel":     "Schliesse die HTML-Datei (SSH): echo '</body></html>' >> ~/website/index.html",
+                "modus":    "ssh",
+                "ziel":     "echo '</body></html>' >> ~/website/index.html",
                 "check":    lambda cmd, out, p: "</body>" in cmd and "</html>" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"💻 Schriftrolle des Abschlusses",
                 "lernziel": "Jedes oefffnende Tag braucht ein schliessendes. </body> und </html> beenden das Dokument.",
             },
             {
                 "id":       "css_create",
-                "ziel":     "Erstelle CSS-Datei (SSH): echo 'body{background:#1a1a2e;color:white;}' > ~/website/style.css",
+                "modus":    "ssh",
+                "ziel":     "echo 'body{background:#1a1a2e;color:white;}' > ~/website/style.css",
                 "check":    lambda cmd, out, p: "style.css" in cmd and "background" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"💻 Schriftrolle des Stils",
                 "lernziel": "CSS = Cascading Style Sheets. Selektor{Eigenschaft:Wert;} gibt Elementen Farbe und Form.",
             },
             {
                 "id":       "css_link",
-                "ziel":     "Verknuepfe CSS mit HTML via sed (SSH): sed -i 's|</head>|<link rel=\"stylesheet\" href=\"style.css\"></head>|' ~/website/index.html",
+                "modus":    "ssh",
+                "ziel":     "sed -i 's|</head>|<link rel=\"stylesheet\" href=\"style.css\"></head>|' ~/website/index.html",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "sed" and "style.css" in cmd and getattr(p, "in_ssh", False),
                 "belohnung":"💻 Schriftrolle der Verknuepfung",
                 "lernziel": "sed -i ersetzt Text direkt in der Datei. Der link-Tag laedt das CSS in den Browser.",
             },
             {
                 "id":       "curl_html",
-                "ziel":     "Rufe deine fertige Seite ab: curl http://152.53.225.236:8080",
+                "modus":    "lokal",
+                "ziel":     "curl http://152.53.225.236:8080",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "curl" and "8080" in cmd and "152.53.225.236" in cmd,
                 "belohnung":"💻 Schriftrolle der Meisterin",
                 "lernziel": "curl zeigt den HTML-Quellcode. Im Browser sieht es mit CSS visuell aus. Oeffne die URL!",
@@ -2401,56 +2419,64 @@ RAEUME = {
         "quests": [
             {
                 "id":       "nano_eigene_seite",
-                "ziel":     "Designe deine eigene Seite: nano index.html",
+                "modus":    "lokal",
+                "ziel":     "nano index.html",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "nano" and "index.html" in cmd,
                 "belohnung":"🚀 Schriftrolle des Designs",
                 "lernziel": "nano oeffnet den Editor. Schreib eigenes HTML! Strg+O speichert, Strg+X beendet.",
             },
             {
                 "id":       "deploy_v1",
-                "ziel":     "Deploye Version 1: scp index.html mia@152.53.225.236:~/website/",
+                "modus":    "lokal",
+                "ziel":     "scp index.html mia@152.53.225.236:~/website/",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "scp" and "index.html" in cmd and "152.53.225.236" in cmd,
                 "belohnung":"🚀 Schriftrolle des ersten Deploys",
                 "lernziel": "scp = Secure Copy. Jedes Mal wenn du deployst, ersetzt du die alte Version auf dem Server.",
             },
             {
                 "id":       "check_v1",
-                "ziel":     "Pruefe deine Live-Seite: curl http://152.53.225.236:8080",
+                "modus":    "lokal",
+                "ziel":     "curl http://152.53.225.236:8080",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "curl" and "8080" in cmd and "deploy_v1" in p.abschluss,
                 "belohnung":"🚀 Schriftrolle der Kontrolle",
                 "lernziel": "Nach jedem Deploy pruefen! curl ist schnell. Oder oeffne http://152.53.225.236:8080 im Browser.",
             },
             {
                 "id":       "aendern_v2",
-                "ziel":     "Aendere etwas an deiner Seite mit sed: sed -i 's/ALTESTEXT/NEUESTEXT/g' index.html",
+                "modus":    "lokal",
+                "ziel":     "sed -i 's/ALTESTEXT/NEUESTEXT/g' index.html",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "sed" and "-i" in cmd and "index.html" in cmd,
                 "belohnung":"🚀 Schriftrolle der Version 2",
                 "lernziel": "sed -i aendert Dateien ohne Editor. Perfekt fuer schnelle Anpassungen im Deploy-Workflow.",
             },
             {
                 "id":       "deploy_v2",
-                "ziel":     "Deploye Version 2: scp index.html mia@152.53.225.236:~/website/",
+                "modus":    "lokal",
+                "ziel":     "scp index.html mia@152.53.225.236:~/website/",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "scp" and "index.html" in cmd and "aendern_v2" in p.abschluss,
                 "belohnung":"🚀 Schriftrolle des zweiten Deploys",
                 "lernziel": "Edit → Deploy → Check → repeat. Das ist der Kern jeder Web-Entwicklung!",
             },
             {
                 "id":       "deploy_script",
-                "ziel":     "Erstelle ein Deploy-Skript: nano deploy.sh",
+                "modus":    "lokal",
+                "ziel":     "nano deploy.sh",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "nano" and "deploy.sh" in cmd,
                 "belohnung":"🚀 Schriftrolle der Automatisierung",
                 "lernziel": "Skripte automatisieren wiederkehrende Aufgaben. Inhalt: #!/bin/bash + scp-Befehl.",
             },
             {
                 "id":       "chmod_deploy",
-                "ziel":     "Mache das Skript ausfuehrbar: chmod +x deploy.sh",
+                "modus":    "lokal",
+                "ziel":     "chmod +x deploy.sh",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "chmod" and "+x" in cmd and "deploy.sh" in cmd,
                 "belohnung":"🚀 Schriftrolle der Ausfuehrung",
                 "lernziel": "chmod +x macht Skripte ausfuehrbar. Ohne +x: Permission denied!",
             },
             {
                 "id":       "run_deploy",
-                "ziel":     "Fuehre dein Deploy-Skript aus: ./deploy.sh",
+                "modus":    "lokal",
+                "ziel":     "./deploy.sh",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "./deploy.sh",
                 "belohnung":"🚀 Schriftrolle der Meisterin",
                 "lernziel": "Ein Befehl, alles deployed. So arbeiten echte DevOps-Teams – nur mit mehr Schritten!",
@@ -2575,7 +2601,16 @@ def zeige_bildschirm(spiel: Spiel, nachricht: str = '', zeige_dialog: bool = Fal
     # ── Aktive Quest ───────────────────────────────────────────────────────────
     aktive = _aktive_quest(spiel)
     if aktive:
-        q_c = c(f"  🎯 Quest: {aktive['ziel']}", F.GELB)
+        modus = aktive.get("modus", "")
+        if modus == "ssh":
+            badge = c("  🖥️  IM SSH-MODUS TIPPEN  (ssh mia@server → mia@server:~$ → Befehl)", F.CYAN + F.FETT)
+        elif modus == "lokal":
+            badge = c("  💻  LOKAL TIPPEN  (KEIN SSH – normaler Prompt)", F.GRUEN + F.FETT)
+        else:
+            badge = None
+        if badge:
+            print(c('║', F.PINK) + badge + ' ' * max(0, W - 2 - vis_len(badge)) + c('║', F.PINK))
+        q_c = c(f"  🎯 {aktive['ziel']}", F.GELB + F.FETT)
         print(c('║', F.PINK) + q_c + ' ' * max(0, W - 2 - vis_len(q_c)) + c('║', F.PINK))
     else:
         alle_done = all(q["id"] in spiel.abschluss for q in spiel.raum().get("quests", []))
@@ -3430,13 +3465,31 @@ def spielschleife(spiel: Spiel):
 
         # ── Alle anderen Befehle: wirklich ausführen ───────────────────────────
         VPS_RAEUME = {"fernwelt", "schluesselschmiede", "zeituhr", "webwerkstatt", "deploymeisterei"}
-        if spiel.ort in VPS_RAEUME and basis_cmd in ("ls", "mkdir", "cd", "cat", "rm", "touch", "pwd"):
-            nachricht = (
-                f"Du bist noch nicht eingeloggt!\n"
-                f"Verbinde zuerst mit dem Server:\n"
-                f"  ssh {VPS_CONFIG.get('user','mia')}@{VPS_CONFIG.get('host','SERVER_IP')}"
-            )
-            spiel.terminal.append((cmd, "[lokal - bitte erst SSH verbinden]"))
+        if spiel.ort in VPS_RAEUME and basis_cmd in ("ls", "mkdir", "cd", "cat", "rm", "touch", "pwd", "crontab", "echo", "sed"):
+            aktive_q = _aktive_quest(spiel)
+            q_modus  = aktive_q.get("modus", "") if aktive_q else ""
+            vps_user = VPS_CONFIG.get('user', 'mia')
+            vps_host = VPS_CONFIG.get('host', 'SERVER_IP')
+            if q_modus == "ssh":
+                nachricht = (
+                    f"🖥️  Dieser Befehl muss AUF DEM SERVER laufen!\n\n"
+                    f"  1. Tippe:  ssh {vps_user}@{vps_host}\n"
+                    f"  2. Du siehst:  {vps_user}@{vps_host}:~$\n"
+                    f"  3. Dann tippe:  {aktive_q['ziel']}\n\n"
+                    f"  Tipp:  sshhilfe  fuer mehr Hilfe"
+                )
+            elif q_modus == "lokal":
+                nachricht = (
+                    f"✅  Dieser Befehl wird LOKAL ausgefuehrt – das ist richtig so!\n"
+                    f"   Aber '{basis_cmd}' hat keine sichtbare Ausgabe erzeugt.\n"
+                    f"   Quest: {aktive_q['ziel'] if aktive_q else '?'}"
+                )
+            else:
+                nachricht = (
+                    f"🖥️  Verbinde dich zuerst per SSH:\n"
+                    f"     ssh {vps_user}@{vps_host}"
+                )
+            spiel.terminal.append((cmd, "[falscher Modus]"))
             spiel.speichern()
             continue
 
