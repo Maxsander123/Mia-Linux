@@ -3308,7 +3308,12 @@ def spielschleife(spiel: Spiel):
                     nachricht = rq
                     zeige_dialog = True
             spiel.in_ssh = False
-            spiel.terminal.append((cmd, f"SSH-Session: {len(verlauf)} Befehle"))
+            # SSH-Verlauf im Terminal-Panel sichtbar machen
+            for r_cmd, r_out in verlauf[-8:]:
+                kurzout = r_out[:80].replace('\n', ' ') if r_out else "✅"
+                spiel.terminal.append((f"ssh> {r_cmd}", kurzout))
+            if not verlauf:
+                spiel.terminal.append((cmd, "SSH-Session beendet (0 Befehle)"))
             spiel.speichern()
             continue
 
@@ -3331,6 +3336,17 @@ def spielschleife(spiel: Spiel):
             continue
 
         # ── Alle anderen Befehle: wirklich ausführen ───────────────────────────
+        VPS_RAEUME = {"fernwelt", "schluesselschmiede", "zeituhr", "webwerkstatt", "deploymeisterei"}
+        if spiel.ort in VPS_RAEUME and basis_cmd in ("ls", "mkdir", "cd", "cat", "rm", "touch", "pwd"):
+            nachricht = (
+                f"Du bist noch nicht eingeloggt!\n"
+                f"Verbinde zuerst mit dem Server:\n"
+                f"  ssh {VPS_CONFIG.get('user','mia')}@{VPS_CONFIG.get('host','SERVER_IP')}"
+            )
+            spiel.terminal.append((cmd, "[lokal - bitte erst SSH verbinden]"))
+            spiel.speichern()
+            continue
+
         rc, out, err = fuehre_aus(cmd, spiel.aktuell)
         ausgabe = out or err or ''
         spiel.terminal.append((cmd, ausgabe[:150]))
