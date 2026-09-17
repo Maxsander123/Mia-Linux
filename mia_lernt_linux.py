@@ -2499,6 +2499,7 @@ class Spiel:
         self.terminal   = []
         self.dialog_idx = {}
         self.in_ssh     = False  # True waehrend SSH-Modus aktiv
+        self.ort_verlauf = []   # Raum-History fuer zurueck-Befehl
 
     def raum_id(self):
         name = self.aktuell.name
@@ -3256,7 +3257,9 @@ def spielschleife(spiel: Spiel):
                 "  konzept – Dateisystem-Erklaerung\n"
                 "  spickzettel – Linux-Spickzettel\n"
                 "  beenden – Spiel beenden (Fortschritt gespeichert)\n"
-                "  sshhilfe – SSH-Anleitung anzeigen"
+                "  sshhilfe – SSH-Anleitung anzeigen\n"
+                "  warp <raum> – Direkt zu einem Raum springen (auch: warp 5)\n"
+                "  zurueck – Einen Raum zurueck"
             )
             spiel.terminal.append((cmd, ''))
             continue
@@ -3350,6 +3353,9 @@ def spielschleife(spiel: Spiel):
 
         # ── cd: Raum wechseln ─────────────────────────────────────────────────
         if basis_cmd == "cd":
+            spiel.ort_verlauf.append(spiel.aktuell)  # History merken
+            if len(spiel.ort_verlauf) > 20:
+                spiel.ort_verlauf.pop(0)
             ziel = teile[1] if len(teile) > 1 else '..'
             if ziel == '..':
                 neues = spiel.aktuell.parent
@@ -3389,6 +3395,63 @@ def spielschleife(spiel: Spiel):
             if q_erg:
                 nachricht = q_erg
                 zeige_dialog = True
+            spiel.terminal.append((cmd, ''))
+            spiel.speichern()
+            continue
+
+        # ── zurueck: einen Raum zurueck ────────────────────────────────────────
+        if basis_cmd in ("zurueck", "back", "zurück"):
+            if spiel.ort_verlauf:
+                vorher = spiel.ort_verlauf.pop()
+                if vorher.exists():
+                    spiel.aktuell = vorher
+                    nachricht = f"↩  Zurueck nach: {spiel.raum()['name']} {spiel.raum()['emoji']}"
+                    zeige_dialog = True
+                else:
+                    nachricht = "⚠️  Vorheriger Raum existiert nicht mehr."
+            else:
+                nachricht = "Du bist schon am Anfang – kein Verlauf vorhanden."
+            spiel.terminal.append((cmd, ''))
+            spiel.speichern()
+            continue
+
+        # ── warp: direkt zu einem Raum springen ────────────────────────────────
+        if basis_cmd == "warp":
+            alle_raeume = list(RAEUME.keys())
+            if len(teile) < 2:
+                raum_liste = "\n".join(
+                    f"  {i+1:2}. {rid:25} {RAEUME[rid]['emoji']} {RAEUME[rid]['name']}"
+                    for i, rid in enumerate(alle_raeume)
+                )
+                nachricht = f"Tippe:  warp <raumname>  oder  warp <nummer>\n\n{raum_liste}"
+            else:
+                ziel_raw = teile[1].lower()
+                # Nummer oder Name
+                ziel_rid = None
+                if ziel_raw.isdigit():
+                    idx = int(ziel_raw) - 1
+                    if 0 <= idx < len(alle_raeume):
+                        ziel_rid = alle_raeume[idx]
+                else:
+                    if ziel_raw in RAEUME:
+                        ziel_rid = ziel_raw
+                    else:
+                        # Fuzzy: erste Übereinstimmung im Namen
+                        for rid in alle_raeume:
+                            if ziel_raw in rid or ziel_raw in RAEUME[rid]['name'].lower():
+                                ziel_rid = rid
+                                break
+                if ziel_rid:
+                    spiel.ort_verlauf.append(spiel.aktuell)
+                    ziel_pfad = spiel.basis / ziel_rid
+                    if not ziel_pfad.exists():
+                        ziel_pfad.mkdir(parents=True, exist_ok=True)
+                    spiel.aktuell = ziel_pfad
+                    raum_info = RAEUME[ziel_rid]
+                    nachricht = f"🌀 Warp nach: {raum_info['emoji']} {raum_info['name']}"
+                    zeige_dialog = True
+                else:
+                    nachricht = f"Raum '{teile[1]}' nicht gefunden.\nTippe  warp  fuer die Liste."
             spiel.terminal.append((cmd, ''))
             spiel.speichern()
             continue
