@@ -3084,6 +3084,19 @@ def ssh_modus(spiel: Spiel) -> list:
             print(c("Verbindung getrennt. Willkommen zurueck im Koenigreich!", F.GELB))
             break
 
+        # http.server & blockiert exec_command → nohup+redirect, kein stdout.read()
+        if "http.server" in remote_cmd:
+            port = "8080"
+            for tok in remote_cmd.split():
+                if tok.isdigit() and 1024 < int(tok) < 65536:
+                    port = tok
+            safe = f"pkill -f 'python3 -m http.server' 2>/dev/null; cd ~/website 2>/dev/null; nohup python3 -m http.server {port} > ~/webserver.log 2>&1 &"
+            client.exec_command(safe, timeout=5)
+            msg = f"🌐  HTTP-Server laeuft auf Port {port}! Lass ihn laufen und tippe: exit"
+            print(c(msg, F.GRUEN))
+            verlauf.append((remote_cmd, f"Server gestartet auf Port {port}"))
+            continue
+
         _, stdout, stderr = client.exec_command(remote_cmd, timeout=15)
         out = stdout.read().decode()
         err = stderr.read().decode()
