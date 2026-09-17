@@ -13,7 +13,10 @@ try:
     import paramiko as _paramiko
     PARAMIKO_OK = True
 except ImportError:
-    PARAMIKO_OK = False
+    print("📦  Installiere paramiko (wird nur einmal benoetigt) ...")
+    subprocess.run([sys.executable, "-m", "pip", "install", "paramiko", "-q"], check=True)
+    import paramiko as _paramiko
+    PARAMIKO_OK = True
 
 VPS_CONFIG: dict = {}
 _vps_cfg = Path.home() / ".mia_vps.ini"
