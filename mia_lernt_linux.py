@@ -2093,7 +2093,8 @@ RAEUME = {
             },
             {
                 "id":       "web_check",
-                "ziel":     "Rufe deine Website ab: curl http://152.53.225.236:8080",
+                "modus":    "lokal",
+                "ziel":     "curl http://152.53.225.236:8080",
                 "check":    lambda cmd, out, p: bool(cmd.split()) and cmd.split()[0] == "curl" and "152.53.225.236" in cmd,
                 "belohnung":"🌐 Schriftrolle des World Wide Web",
                 "lernziel": "curl macht HTTP-Requests. Deine erste selbst gehostete Webseite ist live!",
@@ -3418,11 +3419,14 @@ def spielschleife(spiel: Spiel):
 
         # ── ssh-keygen: Schluesselpaar erstellen (lokal, non-interaktiv) ─────────
         if basis_cmd == "ssh-keygen":
-            # Erzwinge non-interaktiv: -f Pfad, -N '' (kein Passwort)
-            key_path = str(Path.home() / ".ssh" / "id_ed25519")
-            ni_cmd = f"ssh-keygen -t ed25519 -f {key_path} -N ''"
-            rc, out, err = fuehre_aus(ni_cmd, spiel.aktuell)
-            ausgabe = out or err or "Schluessel erstellt!"
+            key_path = Path.home() / ".ssh" / "id_ed25519"
+            if key_path.exists():
+                ausgabe = f"✅ Schluessel bereits vorhanden: {key_path}\n   Nutze: cat {key_path}.pub"
+                rc = 0
+            else:
+                ni_cmd = f"ssh-keygen -t ed25519 -f {key_path} -N ''"
+                rc, out, err = fuehre_aus(ni_cmd, spiel.aktuell)
+                ausgabe = out or err or "Schluessel erstellt!"
             q_erg = pruefe_quest(spiel, cmd, ausgabe)
             nachricht = q_erg if q_erg else ausgabe[:300]
             if q_erg:
@@ -3501,30 +3505,26 @@ def spielschleife(spiel: Spiel):
         if spiel.raum_id() in VPS_RAEUME and basis_cmd in ("ls", "mkdir", "cd", "cat", "rm", "touch", "pwd", "crontab", "echo", "sed"):
             aktive_q = _aktive_quest(spiel)
             q_modus  = aktive_q.get("modus", "") if aktive_q else ""
-            vps_user = VPS_CONFIG.get('user', 'mia')
-            vps_host = VPS_CONFIG.get('host', 'SERVER_IP')
-            if q_modus == "ssh":
-                nachricht = (
-                    f"🖥️  Dieser Befehl muss AUF DEM SERVER laufen!\n\n"
-                    f"  1. Tippe:  ssh {vps_user}@{vps_host}\n"
-                    f"  2. Du siehst:  {vps_user}@{vps_host}:~$\n"
-                    f"  3. Dann tippe:  {aktive_q['ziel']}\n\n"
-                    f"  Tipp:  sshhilfe  fuer mehr Hilfe"
-                )
-            elif q_modus == "lokal":
-                nachricht = (
-                    f"✅  Dieser Befehl wird LOKAL ausgefuehrt – das ist richtig so!\n"
-                    f"   Aber '{basis_cmd}' hat keine sichtbare Ausgabe erzeugt.\n"
-                    f"   Quest: {aktive_q['ziel'] if aktive_q else '?'}"
-                )
-            else:
-                nachricht = (
-                    f"🖥️  Verbinde dich zuerst per SSH:\n"
-                    f"     ssh {vps_user}@{vps_host}"
-                )
-            spiel.terminal.append((cmd, "[falscher Modus]"))
-            spiel.speichern()
-            continue
+            # Lokal-Quests: Befehl normal ausfuehren, KEIN Intercept
+            if q_modus != "lokal":
+                vps_user = VPS_CONFIG.get('user', 'mia')
+                vps_host = VPS_CONFIG.get('host', 'SERVER_IP')
+                if q_modus == "ssh":
+                    nachricht = (
+                        f"🖥️  Dieser Befehl muss AUF DEM SERVER laufen!\n\n"
+                        f"  1. Tippe:  ssh {vps_user}@{vps_host}\n"
+                        f"  2. Du siehst:  {vps_user}@{vps_host}:~$\n"
+                        f"  3. Dann tippe:  {aktive_q['ziel']}\n\n"
+                        f"  Tipp:  sshhilfe  fuer mehr Hilfe"
+                    )
+                else:
+                    nachricht = (
+                        f"🖥️  Verbinde dich zuerst per SSH:\n"
+                        f"     ssh {vps_user}@{vps_host}"
+                    )
+                spiel.terminal.append((cmd, "[Server-Befehl lokal getippt]"))
+                spiel.speichern()
+                continue
 
         rc, out, err = fuehre_aus(cmd, spiel.aktuell)
         ausgabe = out or err or ''
