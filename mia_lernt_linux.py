@@ -14,16 +14,38 @@ try:
     PARAMIKO_OK = True
 except ImportError:
     print("📦  Installiere paramiko (wird nur einmal benoetigt) ...")
-    r = subprocess.run(
-        [sys.executable, "-m", "pip", "install", "paramiko", "-q", "--user"],
-        capture_output=True
-    )
-    if r.returncode != 0:
+    def _install_paramiko():
+        # 1) apt (Debian/Ubuntu, kein pip noetig)
+        if subprocess.run(["which", "apt-get"], capture_output=True).returncode == 0:
+            r = subprocess.run(
+                ["sudo", "apt-get", "install", "-y", "-q", "python3-paramiko"],
+                capture_output=True
+            )
+            if r.returncode == 0:
+                return
+        # 2) pip --user
+        r = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "paramiko", "-q", "--user"],
+            capture_output=True
+        )
+        if r.returncode == 0:
+            return
+        # 3) pip mit ensurepip (falls pip selbst fehlt)
+        subprocess.run([sys.executable, "-m", "ensurepip", "--upgrade"],
+                       capture_output=True)
+        r = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "paramiko", "-q", "--user"],
+            capture_output=True
+        )
+        if r.returncode == 0:
+            return
+        # 4) letzter Ausweg: --break-system-packages
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "paramiko", "-q",
              "--break-system-packages"],
             check=True
         )
+    _install_paramiko()
     import paramiko as _paramiko
     PARAMIKO_OK = True
 
