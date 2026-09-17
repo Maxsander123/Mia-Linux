@@ -3167,6 +3167,8 @@ def scp_upload(local_datei: Path, remote_pfad: str) -> str:
 
 # ── VPS Vorbereitung (laeuft beim Start im Hintergrund) ───────────────────────
 
+_vps_vorbereit_status = {"ok": False, "fehler": ""}
+
 def vps_vorbereiten():
     """Bereinigt und bereitet den VPS fuer das Spiel vor. Laeuft in einem Thread."""
     if not PARAMIKO_OK or not VPS_CONFIG:
@@ -3180,13 +3182,9 @@ def vps_vorbereiten():
         client.connect(host, username=user, password=pw, timeout=15)
 
         befehle = [
-            # Webserver stoppen falls einer laeuft
             "pkill -f 'python3 -m http.server' 2>/dev/null; true",
-            # Website-Ordner sauber aufsetzen
             "rm -rf ~/website && mkdir -p ~/website",
-            # Alte Crontab-Eintraege entfernen
             "crontab -r 2>/dev/null; true",
-            # Zeitlog loeschen
             "rm -f ~/zeitlog.txt",
         ]
         for b in befehle:
@@ -3194,8 +3192,9 @@ def vps_vorbereiten():
             stdout.read(); stderr.read()
 
         client.close()
-    except Exception:
-        pass  # Stiller Fehler – VPS nicht erreichbar ist kein Show-Stopper
+        _vps_vorbereit_status["ok"] = True
+    except Exception as e:
+        _vps_vorbereit_status["fehler"] = str(e)
 
 
 # ── Hauptspielschleife ─────────────────────────────────────────────────────────
@@ -3727,11 +3726,17 @@ def main():
     # VPS im Hintergrund vorbereiten (bereinigt + richtet ein)
     if PARAMIKO_OK and VPS_CONFIG:
         import threading
-        print(c("  🌐  Verbinde mit VPS und bereite Server vor ...", F.GRAU))
+        print(c(f"  🌐  Verbinde mit VPS ({VPS_CONFIG.get('host','?')}) und bereite Server vor ...", F.GRAU))
         _t = threading.Thread(target=vps_vorbereiten, daemon=True)
         _t.start()
-        _t.join(timeout=20)  # max 20s warten, dann weitermachen
-        print(c("  ✅  Server bereit!\n", F.GRUEN))
+        _t.join(timeout=20)
+        if _vps_vorbereit_status["ok"]:
+            print(c("  ✅  Server bereit! (website/ geleert, Webserver gestoppt)\n", F.GRUEN))
+        elif _vps_vorbereit_status["fehler"]:
+            print(c(f"  ⚠️   VPS nicht erreichbar: {_vps_vorbereit_status['fehler'][:80]}", F.GELB))
+            print(c("       VPS-Raeume sind gesperrt bis die Verbindung klappt.\n", F.GRAU))
+        else:
+            print(c("  ⚠️   VPS-Vorbereitung Timeout (>20s) – VPS-Raeume eventuell nicht bereit.\n", F.GELB))
 
     name  = startbildschirm()
     spiel = Spiel(basis, name)
