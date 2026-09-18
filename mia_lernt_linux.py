@@ -50,12 +50,17 @@ except ImportError:
     PARAMIKO_OK = True
 
 VPS_CONFIG: dict = {}
+GEMINI_KEY: str = ""
 _vps_cfg = Path.home() / ".mia_vps.ini"
 if _vps_cfg.exists():
     _c = configparser.ConfigParser()
     _c.read(_vps_cfg)
     if "vps" in _c:
         VPS_CONFIG = dict(_c["vps"])
+    if "gemini" in _c:
+        GEMINI_KEY = _c["gemini"].get("api_key", "")
+if not GEMINI_KEY:
+    GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
 
 # ── Terminal-Breite ────────────────────────────────────────────────────────────
 try:
@@ -2688,6 +2693,44 @@ def anim_scroll(scroll_name: str):
         time.sleep(0.4)
     time.sleep(0.8)
 
+def gemini_website(anfrage: str, html: str, css: str = "") -> tuple[str, str]:
+    """Sendet HTML+Anfrage an Gemini, gibt (neues_html, neues_css) zurück."""
+    import urllib.request, json as _json
+    if not GEMINI_KEY:
+        return "", ""
+    kontext = f"Aktuelle index.html:\n```html\n{html}\n```"
+    if css:
+        kontext += f"\n\nAktuelle style.css:\n```css\n{css}\n```"
+    system = (
+        "Du bist ein Web-Designer. Helfe dem Nutzer seine HTML-Website zu verbessern.\n"
+        f"{kontext}\n\n"
+        "Erfülle die Anfrage. Antworte NUR mit JSON in diesem Format (keine Erklärung davor/danach):\n"
+        '{"html": "...kompletter HTML-Code...", "css": "...kompletter CSS-Code oder leer..."}\n'
+        "Der HTML-Code soll vollständig sein (DOCTYPE bis </html>). Kein Markdown, keine Code-Blöcke."
+    )
+    url = ("https://generativelanguage.googleapis.com/v1beta/models/"
+           f"gemini-2.0-flash:generateContent?key={GEMINI_KEY}")
+    payload = _json.dumps({
+        "contents": [{"parts": [{"text": f"{system}\n\nNutzer-Anfrage: {anfrage}"}]}],
+        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 8192}
+    }).encode("utf-8")
+    req = urllib.request.Request(url, data=payload,
+                                 headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = _json.loads(resp.read().decode("utf-8"))
+            text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+            # Markdown-Code-Blöcke entfernen falls vorhanden
+            if "```json" in text:
+                text = text.split("```json")[1].split("```")[0].strip()
+            elif "```" in text:
+                text = text.split("```")[1].split("```")[0].strip()
+            result = _json.loads(text)
+            return result.get("html", ""), result.get("css", "")
+    except Exception as e:
+        return f"FEHLER: {e}", ""
+
+
 def freier_editor_modus(spiel: Spiel):
     """Freier Website-Editor nach dem Spielende. nano + auto-deploy auf VPS."""
     if not PARAMIKO_OK or not VPS_CONFIG:
@@ -2741,6 +2784,10 @@ def freier_editor_modus(spiel: Spiel):
     print(c(f"║  nano style.css   → CSS bearbeiten".ljust(W-1) + "║", F.WEISS))
     print(c(f"║  deploy           → Manuell deployen".ljust(W-1) + "║", F.WEISS))
     print(c(f"║  curl             → Live-Website abrufen".ljust(W-1) + "║", F.WEISS))
+    if GEMINI_KEY:
+        print(c(f"║  ki <anfrage>     → KI-Designer: Website per Text ändern 🤖".ljust(W-1) + "║", F.MAGENTA + F.FETT))
+    else:
+        print(c(f"║  ki <anfrage>     → KI-Designer (API-Key in ~/.mia_vps.ini eintragen)".ljust(W-1) + "║", F.GRAU))
     print(c(f"║  exit             → Beenden".ljust(W-1) + "║", F.GRAU))
     print(c('╚' + '═' * (W - 2) + '╝', F.CYAN))
     print()
@@ -2801,8 +2848,35 @@ def freier_editor_modus(spiel: Spiel):
             else:
                 print(c(f"  ❌  {ziel} nicht gefunden", F.ROT))
 
+        elif basis_cmd == "ki":
+            anfrage = " ".join(cmd.split()[1:]).strip()
+            if not anfrage:
+                print(c("  Beispiel:  ki mache den Hintergrund dunkel und füge Animationen hinzu", F.GRAU))
+            elif not GEMINI_KEY:
+                print(c("  ❌  Kein Gemini API-Key! Füge ihn in ~/.mia_vps.ini ein:", F.ROT))
+                print(c("      [gemini]", F.GRAU))
+                print(c("      api_key = DEIN_API_KEY", F.GRAU))
+            else:
+                print(c(f"  🤖  KI arbeitet an: \"{anfrage}\" ...", F.MAGENTA))
+                html_inhalt = html_file.read_text() if html_file.exists() else ""
+                css_inhalt  = css_file.read_text()  if css_file.exists()  else ""
+                neues_html, neues_css = gemini_website(anfrage, html_inhalt, css_inhalt)
+                if neues_html.startswith("FEHLER"):
+                    print(c(f"  ❌  {neues_html}", F.ROT))
+                elif neues_html:
+                    html_file.write_text(neues_html)
+                    if neues_css:
+                        css_file.write_text(neues_css)
+                    print(c("  ✅  KI hat die Website aktualisiert!", F.GRUEN))
+                    print(c("  📤  Deploye ...", F.GRAU))
+                    erg = deploy_website()
+                    print(c(f"  {erg}", F.GRUEN))
+                    print(c(f"  🌐  Live: http://{vps_host}:8080", F.CYAN))
+                else:
+                    print(c("  ❌  KI hat keinen gültigen HTML-Code zurückgegeben.", F.ROT))
+
         else:
-            print(c(f"  ❓  Unbekannt. Befehle: nano, deploy, curl, ls, cat, exit", F.GRAU))
+            print(c(f"  ❓  Unbekannt. Befehle: nano, ki, deploy, curl, ls, cat, exit", F.GRAU))
 
 
 def anim_sieg():
