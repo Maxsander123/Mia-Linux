@@ -3209,11 +3209,19 @@ def vps_vorbereiten():
         client.set_missing_host_key_policy(_paramiko.AutoAddPolicy())
         client.connect(host, username=user, password=pw, timeout=15)
 
+        default_html = (
+            "<!DOCTYPE html><html><head><title>Mia Linux</title></head>"
+            "<body><h1>Willkommen auf meinem Server!</h1>"
+            "<p>Erstellt mit Linux-Befehlen im Mia-Abenteuer.</p>"
+            "</body></html>"
+        )
         befehle = [
             "pkill -f 'python3 -m http.server' 2>/dev/null; true",
             "rm -rf ~/website && mkdir -p ~/website",
+            f"echo '{default_html}' > ~/website/index.html",
             "crontab -r 2>/dev/null; true",
             "rm -f ~/zeitlog.txt",
+            f"nohup python3 -m http.server 8080 --directory ~/website > ~/webserver.log 2>&1 &",
         ]
         for b in befehle:
             _, stdout, stderr = client.exec_command(b, timeout=10)
@@ -3664,13 +3672,18 @@ def spielschleife(spiel: Spiel):
                         "<p>Erstellt mit Linux-Befehlen im Mia-Abenteuer.</p>"
                         "</body></html>"
                     )
-                    _c2.exec_command(
+                    chan = _c2.get_transport().open_session()
+                    chan.exec_command(
                         f"mkdir -p ~/website; "
                         f"[ -s ~/website/index.html ] || echo '{default_html}' > ~/website/index.html; "
-                        f"cd ~/website && nohup python3 -m http.server 8080 > ~/webserver.log 2>&1 &"
-                    )[1].read()
+                        f"pkill -f 'python3 -m http.server' 2>/dev/null; "
+                        f"nohup python3 -m http.server 8080 --directory ~/website > ~/webserver.log 2>&1 &"
+                    )
+                    import time as _t; _t.sleep(0.5)
+                    chan.close()
                     _c2.close()
-                    import time as _t; _t.sleep(3)
+                    print(c("  ⏳  Server wird gestartet, warte 4 Sekunden ...", F.GRAU))
+                    _t.sleep(4)
                     rc, out, err = fuehre_aus(cmd, spiel.aktuell)
                     ausgabe = out or err or ''
                     if out:
