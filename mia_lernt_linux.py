@@ -2730,10 +2730,15 @@ def gemini_website(anfrage: str, html: str, css: str = "") -> tuple[str, str]:
                     text = text.split("```")[1].split("```")[0].strip()
                 result = _json.loads(text)
                 return result.get("html", ""), result.get("css", "")
-        except Exception as e:
-            letzter_fehler = str(e)
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", errors="ignore")[:120]
+            letzter_fehler = f"{modell}: HTTP {e.code} – {body}"
             continue
-    return f"FEHLER: {letzter_fehler}", ""
+        except Exception as e:
+            letzter_fehler = f"{modell}: {e}"
+            continue
+    key_hint = f"(Key: ...{GEMINI_KEY[-6:]})" if GEMINI_KEY else "(kein Key)"
+    return f"FEHLER {key_hint}: {letzter_fehler}", ""
 
 
 def freier_editor_modus(spiel: Spiel):
