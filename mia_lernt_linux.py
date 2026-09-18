@@ -2785,7 +2785,7 @@ def freier_editor_modus(spiel: Spiel):
     print(c(f"║  deploy           → Manuell deployen".ljust(W-1) + "║", F.WEISS))
     print(c(f"║  curl             → Live-Website abrufen".ljust(W-1) + "║", F.WEISS))
     if GEMINI_KEY:
-        print(c(f"║  ki <anfrage>     → KI-Designer: Website per Text ändern 🤖".ljust(W-1) + "║", F.MAGENTA + F.FETT))
+        print(c(f"║  ki <anfrage>     → KI-Designer: Website per Text ändern 🤖".ljust(W-1) + "║", F.PINK + F.FETT))
     else:
         print(c(f"║  ki <anfrage>     → KI-Designer (API-Key in ~/.mia_vps.ini eintragen)".ljust(W-1) + "║", F.GRAU))
     print(c(f"║  exit             → Beenden".ljust(W-1) + "║", F.GRAU))
@@ -2857,7 +2857,7 @@ def freier_editor_modus(spiel: Spiel):
                 print(c("      [gemini]", F.GRAU))
                 print(c("      api_key = DEIN_API_KEY", F.GRAU))
             else:
-                print(c(f"  🤖  KI arbeitet an: \"{anfrage}\" ...", F.MAGENTA))
+                print(c(f"  🤖  KI arbeitet an: \"{anfrage}\" ...", F.PINK))
                 html_inhalt = html_file.read_text() if html_file.exists() else ""
                 css_inhalt  = css_file.read_text()  if css_file.exists()  else ""
                 neues_html, neues_css = gemini_website(anfrage, html_inhalt, css_inhalt)
