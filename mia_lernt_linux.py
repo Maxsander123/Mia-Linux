@@ -2709,7 +2709,7 @@ def gemini_website(anfrage: str, html: str, css: str = "") -> tuple[str, str]:
         "Der HTML-Code soll vollständig sein (DOCTYPE bis </html>). Kein Markdown, keine Code-Blöcke."
     )
     url = ("https://generativelanguage.googleapis.com/v1beta/models/"
-           f"gemini-2.0-flash:generateContent?key={GEMINI_KEY}")
+           f"gemini-3.5-flash:generateContent?key={GEMINI_KEY}")
     payload = _json.dumps({
         "contents": [{"parts": [{"text": f"{system}\n\nNutzer-Anfrage: {anfrage}"}]}],
         "generationConfig": {"temperature": 0.7, "maxOutputTokens": 8192}
