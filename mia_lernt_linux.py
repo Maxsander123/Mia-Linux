@@ -2707,16 +2707,20 @@ def _gemini_modelle_entdecken() -> list:
         url = f"https://generativelanguage.googleapis.com/v1beta/models?key={GEMINI_KEY}&pageSize=100"
         with urllib.request.urlopen(url, timeout=8) as resp:
             data = _json.loads(resp.read().decode("utf-8"))
+        _GESPERRT = ("-lite", "-preview", "-exp", "-latest", "001", "002", "003", "004")
         gefunden = []
         for m in data.get("models", []):
             name = m.get("name", "").replace("models/", "")
             methoden = m.get("supportedGenerationMethods", [])
             if "generateContent" not in methoden:
                 continue
-            if "flash" in name and "gemini-" in name:
-                gefunden.append(name)
+            if "flash" not in name or "gemini-" not in name:
+                continue
+            if any(name.endswith(s) or s in name for s in _GESPERRT):
+                continue
+            gefunden.append(name)
         gefunden.sort(reverse=True)
-        _GEMINI_MODELLE_CACHE = gefunden[:5] if gefunden else []
+        _GEMINI_MODELLE_CACHE = gefunden[:4] if gefunden else []
         return _GEMINI_MODELLE_CACHE
     except Exception:
         return []
@@ -2744,6 +2748,7 @@ def gemini_website(anfrage: str, html: str, css: str = "") -> tuple[str, str]:
         "contents": [{"parts": [{"text": prompt_text}]}],
         "generationConfig": {"temperature": 0.7, "maxOutputTokens": 8192}
     }).encode("utf-8")
+    import time as _time
     letzter_fehler = ""
     for modell in modelle:
         url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
@@ -2762,6 +2767,9 @@ def gemini_website(anfrage: str, html: str, css: str = "") -> tuple[str, str]:
                 return result.get("html", ""), result.get("css", "")
         except urllib.error.HTTPError as e:
             body = e.read().decode("utf-8", errors="ignore")[:120]
+            if e.code == 429:
+                _GEMINI_MODELLE_CACHE.clear()
+                _time.sleep(2)
             letzter_fehler = f"{modell}: HTTP {e.code} – {body}"
             continue
         except Exception as e:
