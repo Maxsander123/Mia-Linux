@@ -3852,6 +3852,7 @@ def spielschleife(spiel: Spiel):
                 print()
                 print(c("  Spickzettel:  python3 mia_lernt_linux.py --spickzettel", F.GRAU))
                 print(c("  Konzepte:     python3 mia_lernt_linux.py --konzept", F.GRAU))
+                print(c("  Editor:       python3 mia_lernt_linux.py --editor", F.CYAN))
                 print()
                 if PARAMIKO_OK and VPS_CONFIG:
                     print(c("  🌐  Starte freien Website-Editor ...", F.CYAN))
@@ -4001,6 +4002,14 @@ def main():
 
     if '--konzept' in sys.argv or '-k' in sys.argv:
         zeige_konzept_screen()
+        return
+
+    if '--editor' in sys.argv or '-e' in sys.argv:
+        basis = Path.home() / "linux_abenteuer"
+        welt_aufbauen(basis)
+        spiel = Spiel(basis, "Mia")
+        spiel.laden()
+        freier_editor_modus(spiel)
         return
 
     if '--neustart' in sys.argv:
