@@ -2693,6 +2693,35 @@ def anim_scroll(scroll_name: str):
         time.sleep(0.4)
     time.sleep(0.8)
 
+_GEMINI_MODELLE_CACHE: list = []
+
+def _gemini_modelle_entdecken() -> list:
+    """Fragt die Gemini-API nach verfügbaren Flash-Modellen (cached)."""
+    global _GEMINI_MODELLE_CACHE
+    if _GEMINI_MODELLE_CACHE:
+        return _GEMINI_MODELLE_CACHE
+    import urllib.request, json as _json
+    if not GEMINI_KEY:
+        return []
+    try:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models?key={GEMINI_KEY}&pageSize=100"
+        with urllib.request.urlopen(url, timeout=8) as resp:
+            data = _json.loads(resp.read().decode("utf-8"))
+        gefunden = []
+        for m in data.get("models", []):
+            name = m.get("name", "").replace("models/", "")
+            methoden = m.get("supportedGenerationMethods", [])
+            if "generateContent" not in methoden:
+                continue
+            if "flash" in name and "gemini-" in name:
+                gefunden.append(name)
+        gefunden.sort(reverse=True)
+        _GEMINI_MODELLE_CACHE = gefunden[:5] if gefunden else []
+        return _GEMINI_MODELLE_CACHE
+    except Exception:
+        return []
+
+
 def gemini_website(anfrage: str, html: str, css: str = "") -> tuple[str, str]:
     """Sendet HTML+Anfrage an Gemini, gibt (neues_html, neues_css) zurück."""
     import urllib.request, json as _json
@@ -2708,7 +2737,8 @@ def gemini_website(anfrage: str, html: str, css: str = "") -> tuple[str, str]:
         '{"html": "...kompletter HTML-Code...", "css": "...kompletter CSS-Code oder leer..."}\n'
         "Der HTML-Code soll vollständig sein (DOCTYPE bis </html>). Kein Markdown, keine Code-Blöcke."
     )
-    modelle = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-2.5-flash-lite"]
+    entdeckt = _gemini_modelle_entdecken()
+    modelle = entdeckt if entdeckt else ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
     prompt_text = f"{system}\n\nNutzer-Anfrage: {anfrage}"
     payload = _json.dumps({
         "contents": [{"parts": [{"text": prompt_text}]}],
