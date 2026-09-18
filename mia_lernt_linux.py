@@ -2688,6 +2688,123 @@ def anim_scroll(scroll_name: str):
         time.sleep(0.4)
     time.sleep(0.8)
 
+def freier_editor_modus(spiel: Spiel):
+    """Freier Website-Editor nach dem Spielende. nano + auto-deploy auf VPS."""
+    if not PARAMIKO_OK or not VPS_CONFIG:
+        return
+    vps_host = VPS_CONFIG.get("host", "")
+    vps_user = VPS_CONFIG.get("user", "")
+    vps_pw   = VPS_CONFIG.get("password", "")
+
+    website_dir = spiel.basis / "meine_website"
+    website_dir.mkdir(exist_ok=True)
+    html_file = website_dir / "index.html"
+    css_file  = website_dir / "style.css"
+
+    # Aktuelle Dateien vom VPS laden falls lokal nicht vorhanden
+    try:
+        _cl = _paramiko.SSHClient()
+        _cl.set_missing_host_key_policy(_paramiko.AutoAddPolicy())
+        _cl.connect(vps_host, username=vps_user, password=vps_pw, timeout=10)
+        _sf = _cl.open_sftp()
+        for remote, local in [(f"/home/{vps_user}/website/index.html", html_file),
+                               (f"/home/{vps_user}/website/style.css",  css_file)]:
+            try:
+                _sf.get(remote, str(local))
+            except Exception:
+                pass
+        _sf.close(); _cl.close()
+    except Exception:
+        pass
+
+    if not html_file.exists():
+        html_file.write_text(
+            "<!DOCTYPE html>\n<html>\n<head>\n  <title>Meine Website</title>\n</head>\n"
+            "<body>\n  <h1>Hallo Welt!</h1>\n  <p>Meine eigene Website.</p>\n</body>\n</html>\n"
+        )
+
+    def deploy_website() -> str:
+        ergebnisse = []
+        for f in [html_file, css_file]:
+            if f.exists():
+                ergebnisse.append(scp_upload(f, f"~/website/"))
+        return "\n".join(ergebnisse) if ergebnisse else "Keine Dateien zum Deployen."
+
+    clr()
+    print(c('╔' + '═' * (W - 2) + '╗', F.CYAN + F.FETT))
+    print(c(f"║{'🌐  FREIER WEBSITE-EDITOR'.center(W-2)}║", F.CYAN + F.FETT))
+    print(c('╠' + '═' * (W - 2) + '╣', F.CYAN))
+    print(c(f"║  Deine Website liegt in: {website_dir}".ljust(W-1) + "║", F.GELB))
+    print(c(f"║  Live unter: http://{vps_host}:8080".ljust(W-1) + "║", F.GRUEN))
+    print(c('╠' + '═' * (W - 2) + '╣', F.CYAN))
+    print(c(f"║  nano index.html  → Seite bearbeiten (speichern = auto-deploy!)".ljust(W-1) + "║", F.WEISS))
+    print(c(f"║  nano style.css   → CSS bearbeiten".ljust(W-1) + "║", F.WEISS))
+    print(c(f"║  deploy           → Manuell deployen".ljust(W-1) + "║", F.WEISS))
+    print(c(f"║  curl             → Live-Website abrufen".ljust(W-1) + "║", F.WEISS))
+    print(c(f"║  exit             → Beenden".ljust(W-1) + "║", F.GRAU))
+    print(c('╚' + '═' * (W - 2) + '╝', F.CYAN))
+    print()
+
+    while True:
+        try:
+            cmd = input(c("  🌐 editor> ", F.CYAN + F.FETT)).strip()
+        except (EOFError, KeyboardInterrupt):
+            break
+
+        if not cmd:
+            continue
+
+        basis_cmd = cmd.split()[0]
+
+        if basis_cmd in ("exit", "beenden", "quit"):
+            print(c("  Auf Wiedersehen! Deine Website bleibt live. 🌍", F.GELB))
+            break
+
+        elif basis_cmd == "nano":
+            ziel = cmd.split()[1] if len(cmd.split()) > 1 else "index.html"
+            datei = website_dir / ziel
+            vorher_mtime = datei.stat().st_mtime if datei.exists() else 0
+            subprocess.run(["nano", ziel], cwd=str(website_dir))
+            nachher_mtime = datei.stat().st_mtime if datei.exists() else 0
+            if datei.exists() and nachher_mtime > vorher_mtime:
+                print(c("  📤  Deploye automatisch ...", F.GRAU))
+                erg = deploy_website()
+                print(c(f"  {erg}", F.GRUEN))
+                print(c(f"  🌐  Live: http://{vps_host}:8080", F.CYAN))
+            else:
+                print(c("  (Keine Änderungen gespeichert)", F.GRAU))
+
+        elif basis_cmd == "deploy":
+            print(c("  📤  Deploye ...", F.GRAU))
+            erg = deploy_website()
+            print(c(f"  {erg}", F.GRUEN))
+            print(c(f"  🌐  Live: http://{vps_host}:8080", F.CYAN))
+
+        elif basis_cmd == "curl":
+            url = f"http://{vps_host}:8080"
+            r = subprocess.run(["curl", "-s", "--connect-timeout", "5", url],
+                               capture_output=True, text=True)
+            if r.stdout:
+                print(r.stdout[:500])
+            else:
+                print(c(f"  ❌  Server nicht erreichbar. Tippe 'deploy' um zu starten.", F.ROT))
+
+        elif basis_cmd == "ls":
+            for f in sorted(website_dir.iterdir()):
+                print(c(f"  {f.name}", F.WEISS))
+
+        elif basis_cmd == "cat":
+            ziel = cmd.split()[1] if len(cmd.split()) > 1 else "index.html"
+            datei = website_dir / ziel
+            if datei.exists():
+                print(datei.read_text())
+            else:
+                print(c(f"  ❌  {ziel} nicht gefunden", F.ROT))
+
+        else:
+            print(c(f"  ❓  Unbekannt. Befehle: nano, deploy, curl, ls, cat, exit", F.GRAU))
+
+
 def anim_sieg():
     clr()
     print()
@@ -3713,6 +3830,10 @@ def spielschleife(spiel: Spiel):
             letzter_qid = list(spiel.abschluss)[-1] if spiel.abschluss else ""
             if "drache" in letzter_qid:
                 anim_drachen_sieg(spiel)
+                if PARAMIKO_OK and VPS_CONFIG:
+                    print(c("  🌐  Starte freien Website-Editor ...", F.CYAN))
+                    time.sleep(1.5)
+                    freier_editor_modus(spiel)
             else:
                 anim_sieg()
                 clr()
@@ -3732,6 +3853,10 @@ def spielschleife(spiel: Spiel):
                 print(c("  Spickzettel:  python3 mia_lernt_linux.py --spickzettel", F.GRAU))
                 print(c("  Konzepte:     python3 mia_lernt_linux.py --konzept", F.GRAU))
                 print()
+                if PARAMIKO_OK and VPS_CONFIG:
+                    print(c("  🌐  Starte freien Website-Editor ...", F.CYAN))
+                    time.sleep(1.5)
+                    freier_editor_modus(spiel)
             break
 
 
