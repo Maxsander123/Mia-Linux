@@ -2708,27 +2708,32 @@ def gemini_website(anfrage: str, html: str, css: str = "") -> tuple[str, str]:
         '{"html": "...kompletter HTML-Code...", "css": "...kompletter CSS-Code oder leer..."}\n'
         "Der HTML-Code soll vollständig sein (DOCTYPE bis </html>). Kein Markdown, keine Code-Blöcke."
     )
-    url = ("https://generativelanguage.googleapis.com/v1beta/models/"
-           f"gemini-3.8-flash:generateContent?key={GEMINI_KEY}")
+    modelle = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-2.5-flash-lite"]
+    prompt_text = f"{system}\n\nNutzer-Anfrage: {anfrage}"
     payload = _json.dumps({
-        "contents": [{"parts": [{"text": f"{system}\n\nNutzer-Anfrage: {anfrage}"}]}],
+        "contents": [{"parts": [{"text": prompt_text}]}],
         "generationConfig": {"temperature": 0.7, "maxOutputTokens": 8192}
     }).encode("utf-8")
-    req = urllib.request.Request(url, data=payload,
-                                 headers={"Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = _json.loads(resp.read().decode("utf-8"))
-            text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-            # Markdown-Code-Blöcke entfernen falls vorhanden
-            if "```json" in text:
-                text = text.split("```json")[1].split("```")[0].strip()
-            elif "```" in text:
-                text = text.split("```")[1].split("```")[0].strip()
-            result = _json.loads(text)
-            return result.get("html", ""), result.get("css", "")
-    except Exception as e:
-        return f"FEHLER: {e}", ""
+    letzter_fehler = ""
+    for modell in modelle:
+        url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
+               f"{modell}:generateContent?key={GEMINI_KEY}")
+        req = urllib.request.Request(url, data=payload,
+                                     headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = _json.loads(resp.read().decode("utf-8"))
+                text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+                if "```json" in text:
+                    text = text.split("```json")[1].split("```")[0].strip()
+                elif "```" in text:
+                    text = text.split("```")[1].split("```")[0].strip()
+                result = _json.loads(text)
+                return result.get("html", ""), result.get("css", "")
+        except Exception as e:
+            letzter_fehler = str(e)
+            continue
+    return f"FEHLER: {letzter_fehler}", ""
 
 
 def freier_editor_modus(spiel: Spiel):
